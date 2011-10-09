@@ -1,0 +1,19 @@
+#+TITLE: UReddit: Game Programming [Complete Newbie Guide]
+
+Course URL: http://ureddit.com/class/268
+Instructor: SquashMonster
+me: tangentstorm (michal.wallace@gmail.com)
+
+* Week 1: Languages and Libraries
+http://www.reddit.com/r/learngameprogramming/comments/kv3na/lesson_1_languages_and_libraries/
+** DONE { choose a language and framework }
+language = processing/processing js
+framework = processing
+tools = http://studio.sketchpad.cc/
+** DONE { find or create some images }
+** DONE open a display window
+** DONE load an image
+** TODO start a timing loop
+** DONE draw the image to the display each frame
+** DONE use input to move the image
+** TODO solve the transparent png issue

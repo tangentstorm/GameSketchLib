@@ -1,0 +1,105 @@
+#+TITLE: GameSketch Newbie GameDev Course
+#+TODO: ISSUE TODO STARTED | DONE HOMEWORK
+
+* "Making Simple Games With Processing"
+------------------------------------------
+ Your Host: [[http://michaljwallace.com/][Michal J. Wallace]]
+Video link: http://www.youtube.com/user/tangentstorm
+Live demos: http://studio.sketchpad.cc/sp/padlist/edited-by?editorId=1181
+ at github: https://github.com/sabren/GameSketchLib
+Contact me: michal.wallace [at] gmail.com
+ on Reddit: tangentstorm
+
+* Based on the U. of Reddit Game Programming Course
+------------------------------------------
+Instructor: SquashMonster
+Course URL: http://ureddit.com/class/268
+ SubReddit: [[http://reddit.com/r/learngameprogramming/][/r/learngameprogramming/]]
+
+
+* Week 1: SketchBots
+** Objective
+Move a robot around with the WASD keys.
+Corresponds to: [[http://www.reddit.com/r/learngameprogramming/comments/kv3na/lesson_1_languages_and_libraries/][Languages and Libraries]] by SquashMonster
+** Assignment
+*** DONE { choose a language and framework }
+language = processing/processing js
+framework = processing 
+tools = http://studio.sketchpad.cc/
+*** DONE { find or create some images }
+*** DONE open a display window
+*** DONE load an image
+*** TODO start a timing loop
+*** DONE draw the image to the display each frame
+*** DONE use input to move the image
+*** HOMEWORK move second robot with arrow keys
+*** HOMEWORK finish the bounds checking
+** Issues
+*** ISSUE solve the transparent png issue
+*** ISSUE processing.js js bug with our keyboard code
+[[https://processing-js.lighthouseapp.com/projects/41284/tickets/1692-discrepancy-with-processing-on-switchkey-casecoded#ticket-1692-1][bug #1692]] at the processing.js lighthouse
+
+
+* Week 2: InvaderSketch
+** Objective
+Build a Simple space invaders clone and begin forming GameSkechLib.
+Corresponds to: [[http://www.reddit.com/r/learngameprogramming/comments/l2tir/lesson_2_entities][Entities]] by SquashMonster
+** Assignment
+*** TODO Has enemies, a player, and projectiles for both sides.
+*** TODO Detect collisions appropriately
+*** TODO Remove destroyed objects from the game
+*** HOMEWORK has at least three variants of at least one of the above
+** Lesson Plan
+*** STARTED Intro
+**** TODO Recap last week
+**** TODO Show InvaderSketch
+**** TODO Show GameSketchLib at github
+**** TODO Show links at studio.sketchpad
+*** TODO CollisionDemo
+**** TODO demo
+**** TODO for loops
+**** TODO classes and arrays
+**** TODO mouse events
+*** TODO BulletDemo
+**** TODO demo
+*** TODO GameSketchDemo
+**** TODO demo
+**** TODO GameGroup
+**** TODO GameState
+** Issues
+
+
+* --[ future stuff ]----------------------------------------
+
+* Week 3: Ways to Build Worlds (Platformer assignment)
+"sketchclimber"?
+camera
+2d array access
+scrolling and parallax
+a hud
+Snap everything to a grid for now (no smooth jumping)
+ maybe a game with coins, ladders, and a monster that moves back and forth?
+ sort of like super serif brothers
+maybe very simple tweening?
+Show off the danc tileset.
+
+* Week 4: Level editor
+** piq + getpixel
+use piq + getpixel as a level editor
+http://piq.codeus.net/
+** 
+
+* Week 5: Grids and Quad Trees
+
+
+* --[ admin stuff ]-----------------------------------------
+** color settings for videos:
+
+#+BEGIN_SRC elisp
+(color-theme-charcoal-black)
+(setq org-todo-keyword-faces
+      '(("ISSUE" . org-warning) 
+        ("STARTED" . "gold")
+        ("HOMEWORK" . (:foreground "CornflowerBlue" :weight bold))))
+(org-mode)
+#+END_SRC

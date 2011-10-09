@@ -1,7 +1,7 @@
 #+TITLE: GameSketchLib
 
-GameSketchLib is a simple game engine for [[http://processing.org][processing]]
-and [[http://processingjs.org][processing-js]] inspired by [[http://flixel.org/][flixel]].
+GameSketchLib is a simple game engine for [[http://processing.org/][processing]]
+and [[http://processingjs.org/][processing-js]] inspired by [[http://flixel.org/][flixel]].
 
 It's being developed over a [[http://www.youtube.com/user/tangentstorm][series of video lessons]] which
 loosely follow SquashMonster's [[http://www.reddit.com/r/learngameprogramming/][/r/learngameprogramming]] 

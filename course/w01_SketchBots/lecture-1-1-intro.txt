@@ -1,0 +1,77 @@
+studyguide / warkthrough
+for ured game program class
+
+not instructor
+am a dev, made a few games
+
+contact me on reddit or email
+
+[dont know wtf? see links]
+
+---
+
+"basic programming competency"
+
+some of you guys
+haven't done much programming
+may need a little extra help
+this is for you
+
+---
+
+languages + libraries
+lots of choices
+read this if you haven't
+
+{ point out the link }
+
+--
+
+homework dropoff:
+this is our to-do list
+
+--
+
+NOT how programmers look at code
+
+All sorts of editors.
+
+{ show it in intelliJ }
+
+Free community edition.
+Highly recommend for java.
+
+But I'm not doing java today.
+
+---
+
+Processing very similar to java, but aimed at students.
+
+Completely free.
+
+Runs on mac, windows, linux.
+Compiles to android.
+
+PORT for javascript/html5
+
+---
+
+Which is what we're using.
+
+Largely compatible with each other.
+
+---
+
+go to studio.sketchpad.cc
+create an account
+
+{ click new sketch }
+
+{ run example code }
+
+{ show same in processing }
+
+cool lines, but not what we
+want, so...
+
+
