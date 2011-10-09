@@ -1,4 +1,4 @@
-#+TITLE: GameSketchLib
+* GameSketchLib
 
 GameSketchLib is a simple game engine for [[http://processing.org/][processing]]
 and [[http://processingjs.org/][processing-js]] inspired by [[http://flixel.org/][flixel]].
@@ -7,4 +7,12 @@ It's being developed over a [[http://www.youtube.com/user/tangentstorm][series o
 loosely follow SquashMonster's [[http://www.reddit.com/r/learngameprogramming/][/r/learngameprogramming]] 
 course for the [[http://ureddit.com/][University of Reddit]], but (hopefully)
 simplified for complete beginners to programming.
+
+* Lessons
+
+| Week | Live Game     | Videos        | UReddit Course          |
+|------+---------------+---------------+-------------------------|
+|    1 | [[http://www.youtube.com/playlist?list=PL319D0DFF755E9F6C&feature=viewall][SketchBots]]    | [[http://www.youtube.com/watch?v=WznhcE2bPao&list=PL319D0DFF755E9F6C&index=1][1]] [[http://www.youtube.com/watch?v=WznhcE2bPao&list=PL319D0DFF755E9F6C&index=1][2]] [[http://www.youtube.com/watch?v=WznhcE2bPao&list=PL319D0DFF755E9F6C&index=1][3]] [[http://www.youtube.com/watch?v=WznhcE2bPao&list=PL319D0DFF755E9F6C&index=1][4]] [[http://www.youtube.com/watch?v=WznhcE2bPao&list=PL319D0DFF755E9F6C&index=1][5]] [[http://www.youtube.com/playlist?list=PL319D0DFF755E9F6C&feature=viewall][All]] | [[http://www.reddit.com/r/learngameprogramming/comments/kv3na/lesson_1_languages_and_libraries/][Languages and Libraries]] |
+|    2 | InvaderSketch |               | [[http://www.reddit.com/r/learngameprogramming/comments/l2tir/lesson_2_entities][Entities]]                |
+|      |               |               |                         |
 
