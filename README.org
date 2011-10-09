@@ -8,6 +8,10 @@ loosely follow SquashMonster's [[http://www.reddit.com/r/learngameprogramming/][
 course for the [[http://ureddit.com/][University of Reddit]], but (hopefully)
 simplified for complete beginners to programming.
 
+* Try it live in your browser right now!
+
+To start, click "clone & modify" on the [[http://studio.sketchpad.cc/sp/pad/view/ro.9QgCGSB51i-nJ/latest][BaseGameSketch]] !
+
 * Lessons
 
 | Week | Live Game     | Videos        | UReddit Course          |
