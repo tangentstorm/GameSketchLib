@@ -19,4 +19,4 @@ simplified for complete beginners to programming.
 
 The live games are hosted at [[http://studio.sketchpad.cc/][studio sketchpad]].
 
-Videos are hosted at [[http://www.youtube.com/user/tangentstorm][[youtube]].
+Videos are hosted at [[http://www.youtube.com/user/tangentstorm][youtube]].
