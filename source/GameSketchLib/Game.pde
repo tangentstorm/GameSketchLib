@@ -7,8 +7,9 @@ class GameClass
     
     void init(GameState newState)
     {
-        Game.defaultFont =
-          loadFont("DejaVuSans-48.vlw"); //:PJS-REPLACE:// loadFont("Arial");
+        Game.defaultFont = 
+            CONFIG_JVM ? loadFont("DejaVuSans-48.vlw")
+                       : loadFont("Arial");
         Game.bounds = new GameBounds(0, 0, width, height);
         switchState(newState);
     }

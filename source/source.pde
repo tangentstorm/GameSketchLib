@@ -14,26 +14,25 @@
  *
  */
 
-PrintWriter out = createWriter("BaseGameSketch-Combined.txt");
-
 final String kSpliceMainFile = "-A-";
 final String kSpliceLibStart = "-B-";
 final String kSpliceLibEnd   = "-C-";
-final String kDirName = "BaseGameSketch";
+final String kDirName = "GameSketchLib";
+PrintWriter out = createWriter("BaseGameSketch/BaseGameSketch.pde");
 
 // a sneaky trick so we can replace lines like loadFont(...)
 final String kReplaceMarker = "//:PJS-REPLACE://";
 
 final String chunks[] =
 {
-  kSpliceMainFile  , // BaseGameSketch
+  "BaseGameSketch.pde",
   "MenuState.pde"  ,
   "PlayState.pde"  ,
   kSpliceLibStart  ,
+  kSpliceMainFile  , // "GameSketchLib.pde"
   "Game.pde"       ,
   "GameBounds.pde" ,
   "GameGroup.pde"  ,
-  "GameLoop.pde"   ,
   "GameObject.pde" ,
   "GameRect.pde"   ,
   "GameSquare.pde" ,
@@ -51,25 +50,6 @@ for (int i = 0; i < chunks.length; ++i)
     if (s == kSpliceMainFile)
     {
         String lines[] = loadStrings(kDirName + "/" + kDirName + ".pde");
-        
-        out.println("/* ");
-        out.println(" * " + kDirName);
-        out.println(" * ");
-        out.println(" * http://github.com/sabren/GameSketchLib");
-        out.println(" * ");
-        out.println(" * A small game engine for processing and processing-js,");
-        out.println(" * inspired by flixel.");
-        out.println(" * ");
-        out.println(" * USAGE:");
-        out.println(" * ====================================================");
-        out.println(" * ");
-        out.println(" *  1. Change the size() call below to the window size");
-        out.println(" *     you want to use.");
-        out.println(" * ");
-        out.println(" *  2. Edit PlayState and MenuState to get started!");
-        out.println(" * ");
-
-        out.println(" */");
         
         // strip out he initial comment
         boolean inTheCode = false;
