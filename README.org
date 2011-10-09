@@ -21,6 +21,6 @@ To start, click "clone & modify" on the [[http://studio.sketchpad.cc/sp/pad/view
 |      |               |               |                         |
 
 
-The live games are hosted at [[http://studio.sketchpad.cc/][studio sketchpad]].
+The live demos are hosted at [[http://studio.sketchpad.cc/][studio sketchpad]].
 
 Videos are hosted at [[http://www.youtube.com/user/tangentstorm][youtube]].
