@@ -8,6 +8,10 @@
  * script for studio.sketchpad.cc, which doesn't offer
  * multiple tabs yet.
  *
+ * You can also clone the latest version via sketchpad:
+ *
+ * http://studio.sketchpad.cc/sp/pad/view/ro.9QgCGSB51i-nJ/latest
+ *
  */
 
 PrintWriter out = createWriter("BaseGameSketch-Combined.txt");
@@ -16,6 +20,10 @@ final String kSpliceMainFile = "-A-";
 final String kSpliceLibStart = "-B-";
 final String kSpliceLibEnd   = "-C-";
 final String kDirName = "BaseGameSketch";
+
+// a sneaky trick so we can replace lines like loadFont(...)
+final String kReplaceMarker = "//:PJS-REPLACE://";
+
 final String chunks[] =
 {
   kSpliceMainFile  , // BaseGameSketch
@@ -102,7 +110,15 @@ for (int i = 0; i < chunks.length; ++i)
         String lines[] = loadStrings(kDirName + "/" + s);
         for (int j = 0; j < lines.length; ++j)
         {
-            out.println(lines[j]);
+            if (lines[j].indexOf(kReplaceMarker) != -1)
+            {
+                int cutPoint = lines[j].indexOf(kReplaceMarker) + kReplaceMarker.length();
+                out.println(lines[j].substring(cutPoint));
+            }
+            else
+            {
+                out.println(lines[j]);
+            }
         }
     }
 }

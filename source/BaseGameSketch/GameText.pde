@@ -15,9 +15,17 @@ class GameText extends GameObject
     
     void render()
     {
-        fill(this.textColor);
-        textSize(this.textSize);
-        textAlign(this.textAlign);
-        text(this.text, this.x, this.y);
+        GameText_render(this);
     }
+}
+
+// !! Another processing-js workaround.
+//    Calling txt.render() fails silently.
+//    Maybe it screws up javascript's "this" context?
+void GameText_render(GameText txt)
+{
+    fill(txt.textColor);
+    textSize(txt.textSize);
+    textAlign(txt.textAlign);
+    text(txt.text, txt.x, txt.y);
 }

@@ -3,9 +3,12 @@ class GameClass
 {
     GameState state;
     GameBounds bounds = new GameBounds(0,0,0,0);
+    PFont defaultFont;
     
     void init(GameState newState)
     {
+        Game.defaultFont =
+          loadFont("DejaVuSans-48.vlw"); //:PJS-REPLACE:// loadFont("Arial");
         Game.bounds = new GameBounds(0, 0, width, height);
         switchState(newState);
     }
