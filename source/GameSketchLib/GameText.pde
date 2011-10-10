@@ -25,7 +25,7 @@ class GameText extends GameObject
 void GameText_render(GameText txt)
 {
     fill(txt.textColor);
-    textSize(txt.textSize);
+    textFont(Game.defaultFont, txt.textSize);
     textAlign(txt.textAlign);
     text(txt.text, txt.x, txt.y);
 }

@@ -16,15 +16,36 @@
 
 void draw()
 {
-    Game.state.update();
-    Game.state.render();
+    Game.update();
+    Game.render();
 }
 
+
+
+// global debug flag.
+// so far, this just shows Bounds for sprites
+boolean DEBUG = false;
+
+// a predefined GameSheet, since everyone wants a GameSheet!
+GameSheet SHEET;
+
+// Timer Constants
+float SECONDS = 1000;
+
+// Keyboard Constants:
+char SPACE = ' ';
+char[] WASD_N  = new char[] { 'W', ',', '<' };
+char[] WASD_W  = new char[] { 'A', 'a' };
+char[] WASD_S  = new char[] { 'S', 's', 'O', 'o' };
+char[] WASD_E  = new char[] { 'D', 'd', 'E', 'e' };
+
+
+// global event handlers:
 void mousePressed()  { Game.state.mousePressed();  }
 void mouseReleased() { Game.state.mouseReleased(); }
 void mouseMoved()    { Game.state.mouseMoved();    }
-void keyPressed()    { Game.state.keyPressed();    }
-void keyReleased()   { Game.state.keyReleased();   }
+void keyPressed()    { Game.keys.setKeyDown(true); }
+void keyReleased()   { Game.keys.setKeyDown(null); }
 
 // This figures out which runtime we're using dynamically,
 // so we can do conditional compilation.
