@@ -5,11 +5,12 @@
 *** sketchpad: sketchbots running
 *** processing: InvaderSketch
 *** processing: OverlapDemo ready
+*** eclipse: OverlapDemo in Browse.java
 ** Recap:
-*** Lesson 2 of a Newbie Game Dev Course
+*** Week 2 of Newbie Game Dev Course using Processing
 **** Loosely follows SquashMonster's UReddit Game Dev Course
 **** But really it's for anyone who wants to make games
-*** Last week we got a sprite moving
+*** Last week we got a sprite moving with the WASD keys
 **** > show sketchbots
 *** This week...
 **** > show InvaderSketch
@@ -39,10 +40,12 @@ reusable game library called GameSketchLib
 **** Thurdsay we'll build the game
 *** Let's get started!
 
-** OverlapDemo
+** OverlapDemo: Clickable Square
 *** let's draw some squares
-**** > completely blank sketch
+**** > brand new sketch
 **** > add setup() and size(300, 300)
+**** going to copy and paste a lot
+so you don't have to watch me type everything
 **** > one square with rect
 **** > run
 **** > copy+pase two more
@@ -80,11 +83,13 @@ reusable game library called GameSketchLib
   }
 **** > explain how this code is what we just said
 **** > run it 
+** OverlapDemo: Classes and Arrays
 *** That's great for one square but we're making nine of them
 **** > put the nested loop back in setup
 **** we don't want to create variables like
 x1 x2 x3 all the way to x9
 **** even if we did that, what happens when we have three hundred boxes?
+**** We can't just make twelve hundred variables
 **** there are two general approaches to this problem
 **** let's draw a table to illustrate what these loops produce
 
@@ -171,7 +176,7 @@ which may or may not look like rectangles on the screen
 > add loop inside mousePressed {  if sq.containsPoint() sq.color ... }
 > paste in containspoint(x, y) and x2/y2
 > run to show them changing colors on click
-*** right now we want to move these around and check for overlaps
+** OverlapDemo: drag and drop
 **** dragging is pretty easy
 Square mInHand = null;
 > change the color line to mInHand

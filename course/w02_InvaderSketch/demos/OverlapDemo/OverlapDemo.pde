@@ -135,12 +135,12 @@
      
      for (int i = 0; i < mSquares.length; ++i)
      {
-         for (int j = i; j < mSquares.length; ++j)
+         for (int j = 0; j < mSquares.length; ++j)
          {
-             if (i != j && mSquares[i].overlaps(mSquares[j]))
+             if (j != i && mSquares[i].overlaps(mSquares[j]))
              {
-                 mSquares[i].fillColor = #CCCCCC;
-                 mSquares[j].fillColor = #CCCCCC;
+                 mSquares[i].fillColor = #999999;
+                 mSquares[j].fillColor = #999999;
              }
          }
          mSquares[i].render();
