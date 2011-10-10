@@ -48,28 +48,16 @@ Corresponds to: [[http://www.reddit.com/r/learngameprogramming/comments/l2tir/le
 *** TODO Has enemies, a player, and projectiles for both sides.
 *** TODO Detect collisions appropriately
 *** TODO Remove destroyed objects from the game
-*** HOMEWORK has at least three variants of at least one of the above
+*** TODO has at least three variants of at least one of the above
 ** Lesson Plan
-*** STARTED Intro
-**** TODO Recap last week
-**** TODO Show InvaderSketch
-**** TODO Show GameSketchLib at github
-**** TODO Show links at studio.sketchpad
-*** TODO CollisionDemo
-**** TODO demo
-**** TODO for loops
-**** TODO classes and arrays
-**** TODO mouse events
-*** TODO BulletDemo
-**** TODO demo
-*** TODO GameSketchDemo
-**** TODO demo
-**** TODO GameGroup
-**** TODO GameState
-** Issues
+*** STARTED Part 1: Intro, OverlapDemo
+*** TODO Part 2: BulletDemo
+*** TODO Part 3: GameSketchLib
+*** TODO Part 4: InvaderSketch
 
 
-* --[ future stuff ]----------------------------------------
+
+* --[ future  ]---------------------------------------------
 
 * Week 3: Ways to Build Worlds (Platformer assignment)
 "sketchclimber"?
@@ -103,3 +91,8 @@ http://piq.codeus.net/
         ("HOMEWORK" . (:foreground "CornflowerBlue" :weight bold))))
 (org-mode)
 #+END_SRC
+
+
+
+
+* 

@@ -1,25 +1,264 @@
 
-* Part 1: Classes, Loops, Mouse Input, Simple Overlap Checking
-** for loop: draw rectangles
-** nested for loop
-** goal: move them around
-can't use a formula anymore
-** Bounds class
-*** constructor
-*** draw()
-** show it still works
-** now let's do something on mousePressed
-*** store mHandX, mHandY
-*** could just mess around with x and y in here, but better is to create method
-*** x2 and y2
-*** containsPoint
-** now let's drag them around
-*** mOffX, mOffY
-** now show overlap
-*** overlaps(Bounds)
-*** exercise: contains(Bounds)
-** problems with this:
-- slower and slower as you add more objects
+* Part 1: Overlap Detection
+** setup
+*** emacs: assignments.org open in emacs
+*** sketchpad: sketchbots running
+*** processing: InvaderSketch
+*** processing: OverlapDemo ready
+** Recap:
+*** Lesson 2 of a Newbie Game Dev Course
+**** Loosely follows SquashMonster's UReddit Game Dev Course
+**** But really it's for anyone who wants to make games
+*** Last week we got a sprite moving
+**** > show sketchbots
+*** This week...
+**** > show InvaderSketch
+**** ... We build a Space Invaders Clone!
+**** > back to assignments
+**** It's a big task, but we'll break it down.
+**** This week's lesson will have four parts.
+***** Today we're just going to build this:
+> show OverlapDemo
+
+You can drag these squares around
+they turn gray when they overlap.
+
+Pretty simple stuff, but we'll use this
+exact same logic to track our bullets
+in the game
+
+***** along the way we'll talk about
+classes, loops, and arrays
+which are some pretty basic tools
+that we didn't have last week
+
+**** Tomorrow in part 2
+make some bullets to shoot these squares
+**** Wednesday in part 3
+reusable game library called GameSketchLib
+**** Thurdsay we'll build the game
+*** Let's get started!
+
+** OverlapDemo
+*** let's draw some squares
+**** > completely blank sketch
+**** > add setup() and size(300, 300)
+**** > one square with rect
+**** > run
+**** > copy+pase two more
+**** > manually add 50 and 100 to x
+*** computer can do this for us
+**** > paste simple for loop
+**** > run it
+**** > explain each part
+**** > the name doesn't matter. i is traditional.
+*** loops can be nested
+**** just means one inside the other
+**** j is traditional
+***** but also x and y
+***** or more meaningful names if it's important
+**** > run it
+*** next!
+**** want to move these around with the mouse
+**** but that's too big of a step
+**** let's just go back to one square
+*** make a square change colors when we click
+**** > clear setup except for size()
+**** > color mSquareColor
+**** > add draw() with fill(mSquareColor) and rect()
+**** > change mSquareColor to random collor in mousePressed
+**** > but not what we want
+*** but now we only want it to change color when we click it
+**** processing gives us variables called mouseX and mouseY
+**** we need to see if they're inside the square or not.
+***** mouseX just needs to be between the left and right edges
+***** mouseY needs to be between the top and bottom
+***** like so:
+  if (( x <= mouseX ) && ( mouseX <= (x + w) ) &&
+      ( y <= mouseY ) && ( mouseY <= (y + h) ))
+  {
+  }
+**** > explain how this code is what we just said
+**** > run it 
+*** That's great for one square but we're making nine of them
+**** > put the nested loop back in setup
+**** we don't want to create variables like
+x1 x2 x3 all the way to x9
+**** even if we did that, what happens when we have three hundred boxes?
+**** there are two general approaches to this problem
+**** let's draw a table to illustrate what these loops produce
+
+| i | j |   x |   y |  w |  h |
+|---+---+-----+-----+----+----|
+| 0 | 0 |  50 |  50 | 25 | 25 |
+| 0 | 1 |  50 | 125 | 25 | 25 |
+| 0 | 2 |  50 | 200 | 25 | 25 |
+| 1 | 0 | 125 |  50 | 25 | 25 |
+| 1 | 1 | 125 | 125 | 25 | 25 |
+| 1 | 2 | 125 | 200 | 25 | 25 |
+| 2 | 0 | 200 |  50 | 25 | 25 |
+| 2 | 1 | 200 | 125 | 25 | 25 |
+| 2 | 2 | 200 | 200 | 25 | 25 |
+
+
+**** i was outermost so i and x stay constant as j changes
+**** then i changes and j starts over
+**** here's another column
+
+| i | j | i * 3 + j |   x |   y |  w |  h |
+|---+---+-----------+-----+-----+----+----|
+| 0 | 0 |         0 |  50 |  50 | 25 | 25 |
+| 0 | 1 |         1 |  50 | 125 | 25 | 25 |
+| 0 | 2 |         2 |  50 | 200 | 25 | 25 |
+| 1 | 0 |         3 | 125 |  50 | 25 | 25 |
+| 1 | 1 |         4 | 125 | 125 | 25 | 25 |
+| 1 | 2 |         5 | 125 | 200 | 25 | 25 |
+| 2 | 0 |         6 | 200 |  50 | 25 | 25 |
+| 2 | 1 |         7 | 200 | 125 | 25 | 25 |
+| 2 | 2 |         8 | 200 | 200 | 25 | 25 |
+
+**** the 3 is there because j loops through 3 values
+**** the squares are generated in that order 
+**** if we kept some kind of list
+**** we could refer to them by their position in the list
+**** > type this for them:
+
+squares[0];
+squares[3];
+
+// or:
+
+for (int i = 0; i < squares.length; ++i)
+{
+    doSomethingWith(squares[i]);
+}
+
+
+**** Well, in fact programming languages give us this.
+**** List, Array, ArrayList, etc.
+**** In processing we already know we can make an int:
+int i = 5;
+**** but we can also make an array of ints:
+int[] i = new int[] { 0, 1, 2, 3, 4 };
+**** we can make an array of anything:
+PImage[] images = new PImage[5];
+images[0] = loadImage(...);
+**** we'll use that one for storing frames in an animation later
+**** we can even do this:
+
+Square[] squares = new Square[9];
+
+**** which is what we want
+**** but what is Square?
+**** well if arrays represent the vertical part of our table
+**** classes represent the horizontal part
+**** it's a collection of fields that work together
+**** x, y, w, h make a rectangle
+**** w and h are the same so they make a square
+**** we can use classes to bundle a bunch of variables into one object
+**** We could call our class Rectagle 
+**** but I'm going to call it Bounds 
+because we're using it to represent the boundaries of our objects
+which may or may not look like rectangles on the screen
+**** > paste in Bounds(x,y,w,h) constructor
+**** > paste in Square extends Bounds (x,y,size) with render
+**** > change our loop to make squares and add to array
+**** > add a loop to draw them in draw
+*** as you can see from this render() method
+**** classes are more than just data
+**** they have behavior too.
+**** we can teach them to handle their own clicks
+> add loop inside mousePressed {  if sq.containsPoint() sq.color ... }
+> paste in containspoint(x, y) and x2/y2
+> run to show them changing colors on click
+*** right now we want to move these around and check for overlaps
+**** dragging is pretty easy
+Square mInHand = null;
+> change the color line to mInHand
+> explain break inside the for loop
+> mouseReleased;
+> mouseDragged without mXoff
+> run it, point out the jump when you pick up
+> fix with mXOff
+**** overlap checking has two parts
+***** first, we add a method to Bounds
+****** so a single Bounds can tell if it overlaps another
+****** > paste in overlaps
+***** and now we have to test all the combinations
+> make sure j = 0 in draw
+> paste in draw
+
+Another nested loop does the job.
+
+> run it
+
+*** so that's what we wanted, but hold on a minute.
+
+|   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---+---+---+---+---+---+---+---+---+---|
+| 0 |   |   |   |   |   |   |   |   |   |
+| 1 |   |   |   |   |   |   |   |   |   |
+| 2 |   |   |   |   |   |   |   |   |   |
+| 3 |   |   |   |   |   |   |   |   |   |
+| 4 |   |   |   |   |   |   |   |   |   |
+| 5 |   |   |   |   |   |   |   |   |   |
+| 6 |   |   |   |   |   |   |   |   |   |
+| 7 |   |   |   |   |   |   |   |   |   |
+| 8 |   |   |   |   |   |   |   |   |   |
+
+
+So that's 9 x 9 or 81 checks (remember we start at 0) If we start
+adding objects, that table is going to get even bigger. It's always going to be the square of however many objects we have.
+
+Actually we could cut out nine tests here, because we
+don't need to check an object against itself.
+
+
+|   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---+---+---+---+---+---+---+---+---+---|
+| 0 | . |   |   |   |   |   |   |   |   |
+| 1 |   | . |   |   |   |   |   |   |   |
+| 2 |   |   | . |   |   |   |   |   |   |
+| 3 |   |   |   | . |   |   |   |   |   |
+| 4 |   |   |   |   | . |   |   |   |   |
+| 5 |   |   |   |   |   | . |   |   |   |
+| 6 |   |   |   |   |   |   | . |   |   |
+| 7 |   |   |   |   |   |   |   | . |   |
+| 8 |   |   |   |   |   |   |   |   | . |
+
+
+We can do that by changing this line:
+
+  if (mSquares[i].overlaps(mSquares[j]))
+  if (i != j && mSquares[i].overlaps(mSquares[j]))
+
+The && symbol short circuits so the right side is never evaluated.
+
+We can also cut out the top half because if square[0] overlaps
+square[1], square[1] also overlaps square[0]
+
+
+|   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---+---+---+---+---+---+---+---+---+---|
+| 0 | . | . | . | . | . | . | . | . | . |
+| 1 |   | . | . | . | . | . | . | . | . |
+| 2 |   |   | . | . | . | . | . | . | . |
+| 3 |   |   |   | . | . | . | . | . | . |
+| 4 |   |   |   |   | . | . | . | . | . |
+| 5 |   |   |   |   |   | . | . | . | . |
+| 6 |   |   |   |   |   |   | . | . | . |
+| 7 |   |   |   |   |   |   |   | . | . |
+| 8 |   |   |   |   |   |   |   |   | . |
+
+That brings us down to 36 checks.
+
+To do that
+> start j at i + 1
+
+and now we the i vs j check is redundant
+> remove i != j 
+
+
 
 
 * Part 2: Bullets

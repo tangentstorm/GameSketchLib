@@ -57,6 +57,8 @@
 
  class Square extends Bounds
  {
+     color fillColor = #FFFFFF;
+     
      Square (float x, float y, float side)
      {
          super(x, y, side, side);
@@ -64,6 +66,7 @@
 
      public void render()
      {
+         fill(this.fillColor);
          rect(this.x, this.y, this.w, this.h);
      }
  }
@@ -81,15 +84,38 @@
  void setup()
  {
      size(300, 300);
-
+    
      /*
+ 
+      // manual labor
+      rect( 50, 50, 25, 25);
+      
+      rect(125, 50, 25, 25);
+      rect(200, 50, 25, 25);
+     
+     
+     // computer can do the work
+     for (int i = 0; i < 3; ++i)
+     {
+         rect(75 * i + 50, 50, 25, 25);
+     }
+     
+     // nested loop
+     for (int i = 0; i < 3; ++i)
+     {
+         for (int j = 0; j < 3; ++j)
+         {
+             rect(75 * i + 50, 75 * j + 50, 25, 25);
+         }
+     }
+     
      for (int i = 0; i < kSquareCount; ++i)
      {
          mSquares[i] = new Bounds(75 * i + 50, 50, 25, 25);
      }
      */
 
-     // nested loop example
+     // final version
      for (int i = 0; i < kNumRows; ++i)
      {
          for (int j = 0; j < kPerRow; ++j)
@@ -102,15 +128,19 @@
  void draw()
  {
      background(#3366FF);
-     for (int i = 0; i < kSquareCount; ++i)
+     for (int i = 0; i < mSquares.length; ++i)
      {
-         fill(#FFFFFF);
-
-         for (int j = 0; j < kSquareCount; ++j)
+         mSquares[i].fillColor = #FFFFFF;
+     }
+     
+     for (int i = 0; i < mSquares.length; ++i)
+     {
+         for (int j = i; j < mSquares.length; ++j)
          {
              if (i != j && mSquares[i].overlaps(mSquares[j]))
              {
-                 fill(#CCCCCC);
+                 mSquares[i].fillColor = #CCCCCC;
+                 mSquares[j].fillColor = #CCCCCC;
              }
          }
          mSquares[i].render();
@@ -141,6 +171,13 @@
 
  void mouseDragged()
  {
+     /*
+     if (mInHand != null)
+     {
+         mInHand.x = mouseX;
+         mInHand.y = mouseY;
+     }
+     */
      if (mInHand != null)
      {
          mInHand.x = mouseX + mXOff;
