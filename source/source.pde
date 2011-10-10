@@ -33,11 +33,16 @@ final String chunks[] =
   "Game.pde"       ,
   "GameBounds.pde" ,
   "GameGroup.pde"  ,
+  "GameKeys.pde"   ,
+  "GameMath.pde"   ,
   "GameObject.pde" ,
   "GameRect.pde"   ,
+  "GameSheet.pde"  ,
+  "GameSprite.pde" ,
   "GameSquare.pde" ,
   "GameState.pde"  ,
   "GameText.pde"   ,
+  "GameTimer.pde"  ,
   kSpliceLibEnd    
 };
 

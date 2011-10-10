@@ -508,7 +508,7 @@ that means there are no living invaders, so you win.
 *** Just an object that draws text.
 *** Weird processing-js bug, but don't worry about it.
 *** Just text at a coordinate.
-*** Fonts aren't in GameText yet, BUT:
+*** Only one font at the moment, but you can change it
 **** > show Game.init
 **** processing-js uses truetype via the browser
 **** processing uses vlw files
@@ -523,6 +523,9 @@ javascript runtime makes an empty object look like this
 in java, the toString() returns a string with a memory address in hex
 so I just set a boolean based on that string.
 the other lines are just different ways to write it
+*** Anyway, to change the font, just set defaultFont to something else
+*** Next Topic!
+
 ** GameKeys
 *** generalized version of what we did last week
 *** that one only handled the WASD/arrow keys
