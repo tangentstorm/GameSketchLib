@@ -1,0 +1,385 @@
+* RefactorDemo
+
+I wrote down most of the steps I took as I refactored
+BulletDemo, but I decided it wasn't worth going through
+in detail on the video.
+
+Here are the [completely unedited] notes if anyone wants them.
+
+** just write the GameObject code
+
+class GameGroup extends GameObject
+{
+    ArrayList children = new ArrayList();
+
+    GameGroup()
+    {
+        super(0,0,0,0);
+    }
+    
+    GameObject add(GameObject obj)
+    {
+        this.children.add(obj);
+        return obj;
+    }
+    
+    GameObject get(int i)
+    {
+        return (GameObject) this.children.get(i);
+    }
+    
+    void remove(GameObject obj)
+    {
+        this.children.remove(obj);
+    }
+
+    int size()
+    {
+        return this.children.size();
+    }
+    
+
+    
+    void update()
+    {
+        int len = this.children.size();
+        for (int i = 0; i < len; ++i)
+        {
+            this.get(i).update();
+        }
+    }
+    
+    void render()
+    {
+        int len = this.children.size();
+        for (int i = 0; i < len; ++i)
+        {
+            this.get(i).render();
+        }
+    }
+    
+}
+
+** now replace our old arrays:
+
+GameGroup mSquares = new GameGroup();
+...
+GameGroup mBullets = new GameGroup();
+
+
+// init squares:
+            mSquares.add(new Square(75 * i + 50, 75 * j + 50, 25))
+
+// and bullets:
+        mBullets.add(new Bullet(0,0));
+
+
+update:
+can't do much here yet, but we need to replace the square brackets:
+
+Bullet b = (Bullet) mBullets.get(i);
+Square sq = (Square) mSquares.get(j);
+
+
+
+
+
+render:
+
+move fill to Rectangle
+
+    color liveColor = #FFFFFF;
+    color deadColor = #CCCCCC;
+
+
+        fill(this.alive ? this.liveColor : this.deadColor );
+
+
+nextBullet
+
+can completely go away. replace with "firstDead"
+
+        Bullet b = (Bullet) mBullets.firstDead();
+
+
+
+    GameObject firstDead()
+    {
+        int len = this.children.size();
+        for (int i = 0; i < len; ++i)
+        {
+            GameObject obj = this.get(i);
+            if (! obj.alive) return obj;
+        }
+        return null;
+    }
+
+
+** GameStates
+
+So everything in our game is now a GameObject, and we can group GameObjects into GameGroups.
+
+Well, the entire program follows that same GameObject pattern. We have an 
+update() and a render() and it contains two GameGroups, but GameGroups themselves are GameObjects. 
+
+So our program is pretty much a GameGroup, but it also does a little bit more because it can handle mouse and keyboard events.
+
+Only we're going to mark it as being a special kind of top-level GameGroup,
+which we'll call a GameState.
+
+This way, we can have one state for the event handling when we're actually playing, and another for the title screen, and so on.
+
+class GameState extends GameGroup
+{
+    color bgColor = #000000;
+
+
+    void create()
+    {
+    }
+
+    void render()
+    {
+        background(bgColor);
+        super.render();
+    }
+
+    // empty event handlers:
+    void mousePressed() { }
+    void mouseReleased() { }
+    void mouseMoved() { }
+    void keyPressed() { }
+    void keyReleased() { }
+}
+
+
+And now we can move all our stuff into a playstate:
+
+// right after Bullet. Fire:
+
+
+class PlayState extends GameState
+{
+}
+
+
+>> move in all the vars except SCREEN_BOUNDS
+basically, anything specific to our game should go in the state
+but generic stuff can stay outside
+
+
+>>> now let's consodiate setup() by overriding create()
+
+
+void create()
+{
+....
+}
+
+update, render, and mousePressed can all go inside the class
+
+
+
+that should leave us with:
+
+
+Bounds SCREEN_BOUNDS;
+void setup()
+{
+    size(300, 300);
+    SCREEN_BOUNDS = new Bounds(0, 0, width, height);
+}
+
+void draw()
+{
+    update();
+    render();
+}
+
+
+
+but those last two lines are broken now. we've moved those methods into our GameStates  but we don't have a GameState.
+
+So let's make one.
+
+I'm going to put the global stuff like the current state into a global
+object called Game.  This is just a nice wrapper for our framework.
+sort of like FlxG in flixel.
+
+class GameSketchLib
+{
+    GameState state = new GameState();
+    void switchState(GameState newState)
+    {
+        Game.state = newState;
+        newState.create();
+    }
+}
+// capital G because I'm simulating a static class:
+GameSketchLib Game = new GameSketchLib();
+
+
+and now we can say:
+
+void draw()
+{
+    Game.state.update();
+    Game.state.render();
+}
+
+and we can swap our event handlers out just as easily:
+
+
+void mousePressed()  { Game.state.mousePressed(); }
+void mouseReleased() { Game.state.mouseReleased(); }
+void mouseMoved()    { Game.state.mouseMoved(); }
+void keyPressed()    { Game.state.keyPressed(); }
+void keyReleased()   { Game.state.keyReleased(); }
+
+
+
+// and the screen bounds and stuff
+
+SCREEN_BOUNDS can move inside Game as Game.bounds:
+
+setup():
+
+   size(300, 300);
+   Game.init();
+
+in GameSketchLib:
+
+    Bounds bounds = new Bounds(0,0,0,0);
+    
+    void init()
+    {
+        Game.bounds = new Bounds(0, 0, width, height);
+    }
+
+
+search and replace:
+
+SCREEN_BOUNDS -> Game.bounds
+
+
+** try to run:
+
+kBulletSpeed isn't visible... so we'll just move it into create()
+
+            GameObject b = mBullets.add(new Bullet(0,0));
+            b.dy = kBulletSpeed;
+
+should be gray
+
+so switchState(new PlayState());
+
+it should work...
+
+** TitleState
+
+class TitleState extends GameState
+{
+    void render()
+    {
+        background(0);
+        textSize(20);
+        fill(255);
+        text("GroupDemo. Click to start.", 10, 50);
+    }
+    
+    void mousePressed()
+    {
+        Game.switchState(new PlayState());
+    }
+}
+
+
+Game.init(new TitleState());
+
+    void init(GameState newState)
+    {
+        Game.bounds = new Bounds(0, 0, width, height);
+        switchState(newState);
+    }
+
+
+** One more thing. Let's clean up the overlap code:
+
+
+copy render() and turn it into this:
+
+    void overlap(GameGroup other, int code)
+    {
+        int len = this.children.size();
+        for (int i = 0; i < len; ++i)
+        {
+        }
+    }
+
+
+go back down to PlayState.update and copy the "if (b.alive)" part
+
+rename b to a
+other.size()
+Square sq => GameObject b
+if (b.alive && a.overlaps(b))
+
+now replace the middle stuff with 
+
+        a.onOverlap(b);
+
+push this up in GameObject
+
+    public void onOverlap(GameObject other)
+    {
+    }
+
+
+now in bullet:
+
+    void onOverlap(GameObject other)
+    {
+        this.alive = false;
+        other.alive = false;
+    }
+
+
+and now we can clean up the update code
+
+        mBullets.overlap(mSquares);
+
+    void update()
+    {
+        mBullets.overlap(mSquares);
+        int bulletsLeft = 0;
+        for (int i = 0; i < kBulletCount; ++i)
+        {
+            Bullet b = (Bullet) mBullets.get(i);
+            b.update();
+            if (! b.overlaps(Game.bounds)) b.alive = false;
+            if (! b.alive)
+            {
+                b.x = kBulletW * bulletsLeft++;
+                b.y = height - kBulletH;
+            }
+        }
+        mBulletsLeft = bulletsLeft;
+    }
+
+** remove render()
+replace with:
+
+        bgColor = #3366FF;
+        add(mSquares);
+        add(mBullets);
+
+
+** you win state
+
+copy firstDead to firstAlive ... remove the !
+
+then in update():
+
+
+
+

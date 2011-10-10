@@ -10,6 +10,11 @@ class GameBounds
     
     GameBounds(float x, float y, float w, float h)
     {
+        reset(x, y, w, h);
+    }
+    
+    public void reset(float x, float y, float w, float h)
+    {
         this.x = x;
         this.y = y;
         this.w = w;

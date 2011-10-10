@@ -332,421 +332,420 @@ else
 
 ** and now we have something that's starting to feel a bit like space invaders!
 
+** That's all for this video.
+A lot of what we've done up to this point is really
+kind of universal to any game.
+
+So in the next video, we're going to take a step back
+and see if we can separate out the generic parts into
+a reusable framework.
+
+Seeya then!
 
 
-* Part 3: GameSketchDemo
+* part 3 lecture : A Game Sketch Library
+** setup
+- BulletDemo open in eclipse on left but AS A JAVA FILE
+- RefactorDemo open in eclipse on right as a PDE file
+- both open in WinMerge
+- VPP open to GameSketchLib class diagram
+- Illustrator open to the sprite sheet
+- GameSketchLib open in processing (with tabs)
+- have last week's image folder handy
+- github page open in chrome
+** RefactoredDemo
+*** show the demo
+refactoring is about removing duplication and improving the design.
+only thing visibly different is that I added a menu
+but under the hood all kinds of things changed
+*** in fact, i kind of got carried away.
+I wound up turning this refactoring exercise into a complete game engine.
+*** show GameSketchLib at github
+[ show source/GameSketchLib directory ]
 
-GroupDemo from BulletDemo
+You can kind of see there's a lot there, some of it's new,
+but most of it is just cleaned up and redesigned versions
+of ideas we've already seen.
 
-** just write the GameObject code
+Anyway, we'd be here forever if I tried to explain every line,
+so I'm just going to give you the highlights.
 
-class GameGroup extends GameObject
+*** By the way: all the sketches and the course materials are in here
+[show top level README with the table]
+
+Lecture notes and demos are under the course directory.
+
+[show week 02 directory]
+
+[show the BulletDemo source] what we did yesterday
+
+[show week02.org]
+[search for >>> ]
+
+>>> Here's the script for what I'm saying now. :) <<<
+
+Anyway... Back to our story. 
+Let's take a look at what changed.
+
+** Going to use a couple tools to show the changes
+*** WinMerge
+just shows the differences between any two files
+I put old on the left, new on the right.
+
+Here you can see there's a bunch of gold on the right, because
+I moved a lot of the reusable stuff into new classes that aren't
+part of the main code.
+
+Then most of the sketch variables and the setup code is gone,
+because I've moved all that into a class of its own too.
+
+Then there are just lots of little changes. If you're really
+curious, I kept a log of what I did. It's in the git repository
+under "refactoring.org".
+
+*** Eclipse
+has a very basic processing mode
+But it's a very solid java IDE.
+Since processing code is ALMOST java, we can use it to navigate.
+[Stick the whole thing in Browse.java in Eclipse]
+
+** So: The first thing I did was create GameGroup
+*** GameGroup takes the place of GameObject[]
+so mBullets[] and mSquares[] : now they're GameGroups
+*** Once we do that, we have a place to encapsulate a bunch of common tasks that deal with groups
+**** example: in BulletDemo::update, we loop through all the squares and bullets and see if they overlap
+**** but overlapping two groups is very very common
+**** so we can move that up into GameGroup.overlaps
+**** other examples:
+***** BulletDemo::render() had two loops
+****** now we just have two calls to Group.render()
+****** i moved the color switching stuff up into rectangle
+****** [show GameGroup.render]
+***** we can also do GameGroup.update() to update all members
+****** That means you can control which groups are updated or rendered first,
+or hide an entire group at once.
+***** Also a good place for common queries
+****** last time we had nextBullet()
+****** firstDead
+we'll use this again to remove dead aliens in the next video
+****** firstAlive
+****** I'll probably add a lot more as we go along.
+
+** Let's talk about GameStates
+*** Gamestates are just top-level GameGroups
+[point out the old render again]
+[show how it maps to the new render]
+*** so your MenuState might be a GameGroup with a bunch of text objects
+[show TitleState and PlayState] - we'll look at them again in a minute
+and your PlayState would have your game objects
+but they're both just groups of objects that need to be updated and rendered
+Actually, GameState does a litle bit more.
+
+*** Show the base GameState class
+**** create is just a placeholder for you to add your stuff
+**** render draws a background
+**** it also has the empty event handlers
+***** these may go away
+***** i'll show you a universal keyboard handler in a bit
+***** but the basic idea is the same:
+**** the top level event handlers just dispatch to Game
+***** [show top level draw() at hte bottom]
+***** Game is always the same object (Singleton)
+***** Game dispatches to the current state, which can change at any time
+
+*** Show Game
+**** Singleton: You don't use the class, just the one instance.
+**** init and switchState are the interface
+**** init takes the place of a constructor
+it creates a Bounds object so we can test if things are offscreen
+and then calls switchState on whatever you passed in.
+**** switchState sets the state
+
+*** Show TitleState
+**** Just overrides render()
+**** Not a very good example, but I didn't have GameText objects.
+*** Show MenuState from GameSketchLib
+**** GameText is just another GameObject, so you can add it.
+**** Then you don't even need a render() - it's all generic.
+**** Show again: it draws the background, then everything in the group.
+**** [Run GameSketchLib so you can see it]
+*** Back to PlayState from the RefactorDemo
+**** all the top level variables are inside the class
+**** create() takes the place of setup()
+**** our top level update() is now just the update method
+**** and our top level mousePressed is now just the mousePressed() method
+**** PlayState and TitleState both have mousePressed() but only one gets called
+because the main mousePressed() calls Game.state.mousePressed()
+and there's only one Game.state at a time.
+**** The only other real difference is I added a check for killing all the squares:
+if firstAlive() == null
+that means there are no living invaders, so you win.
+
+** That's pretty much it for RefactorDemo, but I didn't stop there
+*** show the uml diagram
+**** This is a UML class diagram for GameSketchLib
+***** The arrows indicate subclassing.
+***** GameBounds is still at the top, etc.
+***** the gray ones are all new since RefactorDemo
+***** We'll look at each of them in a minute.
+***** But first:
+**** This definitely isn't perfect
+***** May change as the library evolves.
+***** GameGroup doesn't really need GameBounds
+**** I was sort of emulating Flixel
+***** [show flixel uml diagram]
+***** FlxObject has Bounds stuff
+***** FlxObject and FlxGroup subclass FlxBasic
+***** But you can see state is a group, sprite is an FlxObject
+***** Our Game singleton is a cross between FlxGame and FlxG.
+***** Really solid library, and I may steal even more later. :)
+**** Let's look at the new classes
+** GameMath
+*** only one method so far, which I stole from XNA.
+*** > show clamp
+** GameText
+*** We already saw this in the MenuState
+*** Just an object that draws text.
+*** Weird processing-js bug, but don't worry about it.
+*** Just text at a coordinate.
+*** Fonts aren't in GameText yet, BUT:
+**** > show Game.init
+**** processing-js uses truetype via the browser
+**** processing uses vlw files
+**** > tools / create font 
+**** CONFIG_JVM is a boolean
+***** > explain what the ? : does
+***** wanted to run same code in either environment
+***** made this up so code could handle either case
+***** (may be a better way, but I couldn't find it)
+***** magic is in GameSketchLib.pde
+javascript runtime makes an empty object look like this
+in java, the toString() returns a string with a memory address in hex
+so I just set a boolean based on that string.
+the other lines are just different ways to write it
+** GameKeys
+*** generalized version of what we did last week
+*** that one only handled the WASD/arrow keys
+*** this handles everything
+*** instead of fiddling bits, we just have a hashmap full of booleans
+**** like a filing cabinet
+**** look things up by an identifier (key)
+**** keys are unique
+**** here the keys are characters and the numeric keyCodes
+**** > show example at the bottom
+*** > briefly mention the keyboard bug from last week
+**** works in processing but not in processing-js
+**** in short, you can't use CODED as a case in a switch statement
+**** keyboard_tests directory has details
+**** i submitted a bug report
+**** this code works around the problem
+
+** GameSheet
+*** last week, every image was separate.
+> show last week's images
+*** we hadn't talked about arrays or loops or classes
+*** now it's pretty easy
+*** uses the same CONFIG_PJS trick for the "data" directory.
+*** constructor takes an imagename and a grid size and builds a list of squares
+> show our sprite sheet in illustrator
+note the 50 x 50 grid - all the same size
+frame numbers start at 0 in upper left
+*** you can ask it for a single frame or an array
+*** ... which will come in handy, since next up is sprites
+** GameSprite
+*** Just a GameObject that shows an image
+*** two constructors
+**** array of images
+**** still image
+just for convenience
+turns it into an array inside
+*** both call sizeToFrame
+**** which updates the bounds
+**** xOffset and yOffset 
+sprites can rotate
+this just figures out the center
+which we'll see in the next video
+*** update() does flipbook-style animation 
+**** just cycles through the frame every tick
+**** has its own framerate from the timer
+we'll look at GameTimer in a second
+**** the ++ increments the frame and then % wraps around
+**** turn off flipbook with .animated 
+might not want to cycle even though you have multiple frames
+example: robots last week only change frame to match direction
+*** we'll see randomize tomorrow
+*** render does rotation magic.
+we don't need to worry about it.
+** Last but not Least : GameTimer
+*** > jump to update and highlight Game.frameMillis
+**** how many milliseconds have passed since the last update
+**** > might as well show Game.update
+*** GameTimer just makes that more usable
+we saw it for animation
+also use it to schedule anything
+can have more than one
+two things at different intervals ? two gametimers
+in fact, each sprite's animation Timer is separate
+*** Here's how to use it
+> show doc comment
+GameTimer timer = new GameTimer(number * SECONDS);
+then in your update, call timer.update() and check for ready
+(we just saw that in GameSprite)
+*** change speed any time with setTicksPerSecond()
+or just set millisPerTick directly.
+** Okay, that's the tour!
+Next video we're going to use all this to make our game!
+If you want to play with it:
+> show the live link in the browser
+
+
+* Part 4: InvaderSketch
+** setup
+have completed InvaderSketch code open for copy/paste
+** > show InvaderSketch
+last time we walked through GameSketchLib
+now we're going to use it to build this!
+** > set up a new game
+*** > run source.pde
+*** > BaseGameSketch open/save as
+*** > MenuState: change click to press enter
+** set up our groups
+*** > add the member variables
+*** > add groups to the state at bottom of create()
+**** they're empty but that doesn't hurt anything
+** > create HeroSprite class and move him
+*** > goE/goW/clamp to move
+*** spacebar to shoot
+**** Bullet class is same as before except two things:
+***** first, it's a sprite instead of a rectangle
+uses getFrames but not Animated
+we'll see that again when we do the shields
+***** second, slightly different collision detection
+trueBounds
+gets reset in update()
+kind of a hack, but it'll work for now
+
+also, other.hurt() instead of other.alive = false
+
+**** USING the bullets is almost exactly the same
+
+class Bullet extends GameSprite
+
+final int kBulletCount = 3;
+final float kBulletSpeed = -3.75;
+int mBulletsLeft = kBulletCount;
+
+void createBullets()
+void updateHeroBullets()
+
+*** > play game : move and shoot
+** > Add the aliens
+*** > Use this version to demo flipbook animation
+class ShipInvader extends GameSprite
 {
-    ArrayList children = new ArrayList();
-
-    GameGroup()
+    ShipInvader(int x, int y)
     {
-        super(0,0,0,0);
-    }
-    
-    GameObject add(GameObject obj)
-    {
-        this.children.add(obj);
-        return obj;
-    }
-    
-    GameObject get(int i)
-    {
-        return (GameObject) this.children.get(i);
-    }
-    
-    void remove(GameObject obj)
-    {
-        this.children.remove(obj);
-    }
-
-    int size()
-    {
-        return this.children.size();
-    }
-    
-
-    
-    void update()
-    {
-        int len = this.children.size();
-        for (int i = 0; i < len; ++i)
-        {
-            this.get(i).update();
-        }
-    }
-    
-    void render()
-    {
-        int len = this.children.size();
-        for (int i = 0; i < len; ++i)
-        {
-            this.get(i).render();
-        }
-    }
-    
+        super(x, y, SHEET.getFrame(1));
+    }    
 }
 
-** now replace our old arrays:
 
-GameGroup mSquares = new GameGroup();
-...
-GameGroup mBullets = new GameGroup();
-
-
-// init squares:
-            mSquares.add(new Square(75 * i + 50, 75 * j + 50, 25))
-
-// and bullets:
-        mBullets.add(new Bullet(0,0));
-
-
-update:
-can't do much here yet, but we need to replace the square brackets:
-
-Bullet b = (Bullet) mBullets.get(i);
-Square sq = (Square) mSquares.get(j);
-
-
-
-
-
-render:
-
-move fill to Rectangle
-
-    color liveColor = #FFFFFF;
-    color deadColor = #CCCCCC;
-
-
-        fill(this.alive ? this.liveColor : this.deadColor );
-
-
-nextBullet
-
-can completely go away. replace with "firstDead"
-
-        Bullet b = (Bullet) mBullets.firstDead();
-
-
-
-    GameObject firstDead()
+class SpinInvader extends GameSprite
+{
+    SpinInvader(int x, int y)
     {
-        int len = this.children.size();
-        for (int i = 0; i < len; ++i)
-        {
-            GameObject obj = this.get(i);
-            if (! obj.alive) return obj;
-        }
-        return null;
-    }
-
-
-** GameStates
-
-So everything in our game is now a GameObject, and we can group GameObjects into GameGroups.
-
-Well, the entire program follows that same GameObject pattern. We have an 
-update() and a render() and it contains two GameGroups, but GameGroups themselves are GameObjects. 
-
-So our program is pretty much a GameGroup, but it also does a little bit more because it can handle mouse and keyboard events.
-
-Only we're going to mark it as being a special kind of top-level GameGroup,
-which we'll call a GameState.
-
-This way, we can have one state for the event handling when we're actually playing, and another for the title screen, and so on.
-
-class GameState extends GameGroup
-{
-    color bgColor = #000000;
-
-
-    void create()
-    {
-    }
-
-    void render()
-    {
-        background(bgColor);
-        super.render();
-    }
-
-    // empty event handlers:
-    void mousePressed() { }
-    void mouseReleased() { }
-    void mouseMoved() { }
-    void keyPressed() { }
-    void keyReleased() { }
-}
-
-
-And now we can move all our stuff into a playstate:
-
-// right after Bullet. Fire:
-
-
-class PlayState extends GameState
-{
-}
-
-
->> move in all the vars except SCREEN_BOUNDS
-basically, anything specific to our game should go in the state
-but generic stuff can stay outside
-
-
->>> now let's consodiate setup() by overriding create()
-
-
-void create()
-{
-....
-}
-
-update, render, and mousePressed can all go inside the class
-
-
-
-that should leave us with:
-
-
-Bounds SCREEN_BOUNDS;
-void setup()
-{
-    size(300, 300);
-    SCREEN_BOUNDS = new Bounds(0, 0, width, height);
-}
-
-void draw()
-{
-    update();
-    render();
-}
-
-
-
-but those last two lines are broken now. we've moved those methods into our GameStates  but we don't have a GameState.
-
-So let's make one.
-
-I'm going to put the global stuff like the current state into a global
-object called Game.  This is just a nice wrapper for our framework.
-sort of like FlxG in flixel.
-
-class GameSketchLib
-{
-    GameState state = new GameState();
-    void switchState(GameState newState)
-    {
-        Game.state = newState;
-        newState.create();
-    }
-}
-// capital G because I'm simulating a static class:
-GameSketchLib Game = new GameSketchLib();
-
-
-and now we can say:
-
-void draw()
-{
-    Game.state.update();
-    Game.state.render();
-}
-
-and we can swap our event handlers out just as easily:
-
-
-void mousePressed()  { Game.state.mousePressed(); }
-void mouseReleased() { Game.state.mouseReleased(); }
-void mouseMoved()    { Game.state.mouseMoved(); }
-void keyPressed()    { Game.state.keyPressed(); }
-void keyReleased()   { Game.state.keyReleased(); }
-
-
-
-// and the screen bounds and stuff
-
-SCREEN_BOUNDS can move inside Game as Game.bounds:
-
-setup():
-
-   size(300, 300);
-   Game.init();
-
-in GameSketchLib:
-
-    Bounds bounds = new Bounds(0,0,0,0);
-    
-    void init()
-    {
-        Game.bounds = new Bounds(0, 0, width, height);
-    }
-
-
-search and replace:
-
-SCREEN_BOUNDS -> Game.bounds
-
-
-** try to run:
-
-kBulletSpeed isn't visible... so we'll just move it into create()
-
-            GameObject b = mBullets.add(new Bullet(0,0));
-            b.dy = kBulletSpeed;
-
-should be gray
-
-so switchState(new PlayState());
-
-it should work...
-
-** TitleState
-
-class TitleState extends GameState
-{
-    void render()
-    {
-        background(0);
-        textSize(20);
-        fill(255);
-        text("GroupDemo. Click to start.", 10, 50);
-    }
-    
-    void mousePressed()
-    {
-        Game.switchState(new PlayState());
+        super(x, y, SHEET.getFrames(new int[] { 2, 3 }));
     }
 }
 
-
-Game.init(new TitleState());
-
-    void init(GameState newState)
+class JellInvader extends GameSprite
+{
+    JellInvader(int x, int y)
     {
-        Game.bounds = new Bounds(0, 0, width, height);
-        switchState(newState);
+        super(x, y, SHEET.getFrames(new int[] { 8, 9, 10, 11 }));
     }
+}
+*** > paste in the nested create loop
+just a couple nested loops
+same thing we did with squares last time
 
+except we added a switch statement
 
-** One more thing. Let's clean up the overlap code:
+also adding them to a group as we go
+notice the mShipInvaders distinct from mInvaders
+add them to TWO groups because we'll pick one randomly to shoot
 
+*** > play the game : enemies should die
+*** > add movement animations
+**** paste in JellInvader.update and yDrift
+**** paste in SpinInvader.update and yDelta
+> show how the rotation stuff works
+turn on DEBUG
+note: rotates around center
+sprite's x and y is still the upper left corner
+*** > show what randomize() does
+*** > paste in the for movement randomization 
 
-copy render() and turn it into this:
+** > make the aliens move
+*** > paste updateInvaders()
+**** comment out the game over check
+**** > run to show what it does
+**** let's see how it works
+**** removeDead:
+mInvaders.removeDead is just a tiny optimization
+mShipInvaders.removeDead is important, though, since they'll shoot back
+**** real quick: something new in GameGroup.removeDead
+... a while loop!
+don't want to use a for loop if you're changing the arraylist
+true is always true so it goes on forever
+but our old friend break is here too.
+break jumps to the end of loops too.
+**** okay, back to updateInvaders()
+*** We're using a GamTimer to control the animation
+we saw GameTimer yesterday
+our spin and up/down animations don't really need accurate timing
+but this one matters, because game over if they reach the bottom
 
-    void overlap(GameGroup other, int code)
-    {
-        int len = this.children.size();
-        for (int i = 0; i < len; ++i)
-        {
-        }
-    }
+*** other than the timer, pretty much same as the other movement animations
+in fact: may end up moving this repeating code into a GameTween class
+*** anyway: here the fleet moves 2px every tenth of a second.
+*** moves down every time it hits the wall
 
+** enemy fire
+*** > paste enemyFire() , add to update(), and run it
+*** another use for randomize
+**** before we just wanted them to be out of sync
+**** here want to vary the time between shots
+**** random, but make it about every 2 seconds on average
+***** so set it to 4 seconds
+***** half the time it'll be between 0 and 2s
+***** half the time it'll be between 2 and 4 seconds
+***** so 2s is right in the middle
+**** true parameter makes timer ready immediately
+that randomizes the first shot
+otherwise, since we don't call random until the timer is ready
+the first shot would always take the full 4 seconds
+**** but wait a bit so the player can warm up
 
-go back down to PlayState.update and copy the "if (b.alive)" part
+*** bullet kills hero, so...
+**** > paste in GameOverState
+Basically same as MenuState
+Different Text
+Goes to menustate
+**** > paste in Hero.onDeath()
+**** > run it. catch a bullet. die.
+*** two other end states:
+**** first, you can kill al the invaders
+***** > paste checkForWin line in update
+***** > paste WinState
+just extends GameOverState with different text
+**** final end state is if alien reaches the ground
+***** > uncomment that in updateInvaders
+***** it works, but we won't sit around and watch to make sure
 
-rename b to a
-other.size()
-Square sq => GameObject b
-if (b.alive && a.overlaps(b))
-
-now replace the middle stuff with 
-
-        a.onOverlap(b);
-
-push this up in GameObject
-
-    public void onOverlap(GameObject other)
-    {
-    }
-
-
-now in bullet:
-
-    void onOverlap(GameObject other)
-    {
-        this.alive = false;
-        other.alive = false;
-    }
-
-
-and now we can clean up the update code
-
-        mBullets.overlap(mSquares);
-
-    void update()
-    {
-        mBullets.overlap(mSquares);
-        int bulletsLeft = 0;
-        for (int i = 0; i < kBulletCount; ++i)
-        {
-            Bullet b = (Bullet) mBullets.get(i);
-            b.update();
-            if (! b.overlaps(Game.bounds)) b.alive = false;
-            if (! b.alive)
-            {
-                b.x = kBulletW * bulletsLeft++;
-                b.y = height - kBulletH;
-            }
-        }
-        mBulletsLeft = bulletsLeft;
-    }
-
-** remove render()
-replace with:
-
-        bgColor = #3366FF;
-        add(mSquares);
-        add(mBullets);
-
-
-** you win state
-
-copy firstDead to firstAlive ... remove the !
-
-then in update():
-
-
-
-
-
-* Part 4: InvaderDemo
-
-** later
-
-**** ArrayList instead.
-might not be as efficient, has garbage collection issues, but it's okay
-going to use it for something else in a bit.
-
-like an array, but can grow
-ArrayList mBullets = new ArrayList();
-mBullets.add(new Bullet(mouseX, mouseY));
-
-so now we're creating lots of bullets, but...
-
-**** show the bullets
-squares don't move anymore
-
-
-**** update()
-**** render()
-**** 
-
-
-
-
-*** classes
-*** arrays
-
-using classes for sprites
-using Arrays for sprite sheets
-
-*** State swapping
-
+** Last Step: add shields
+*** > paste in Shield
+*** > show the frames in illustrator
+*** we just override hurt() to make it happen
+*** > add updateShields() to update()
 

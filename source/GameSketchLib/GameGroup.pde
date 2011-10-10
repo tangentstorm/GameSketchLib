@@ -28,21 +28,36 @@ class GameGroup extends GameObject
         return this.children.size();
     }
     
+    boolean isEmpty()
+    {
+        return this.size() == 0;
+    }
+    
+    GameObject atRandom()
+    {
+        if (this.isEmpty()) return null;
+        return this.get((int) random(this.size()));
+    }
+    
     void update()
     {
+        GameObject obj;
         int len = this.children.size();
         for (int i = 0; i < len; ++i)
         {
-            this.get(i).update();
+            obj = this.get(i);
+            if (obj.exists) obj.update();
         }
     }
     
     void render()
     {
+        GameObject obj;
         int len = this.children.size();
         for (int i = 0; i < len; ++i)
         {
-            this.get(i).render();
+            obj = this.get(i);
+            if (obj.exists && obj.visible) obj.render();
         }
     }
     
@@ -89,6 +104,14 @@ class GameGroup extends GameObject
         return null;
     }
 
-    
+    void removeDead()
+    {
+        while (true)
+        {
+            GameObject body = firstDead();
+            if (body == null) { break; } else { remove(body); }
+        }
+    }
+
 }
 
