@@ -1,31 +1,25 @@
 class GameText extends GameObject
 {
-    String text;
+    String label;
     color textColor;
-    int textSize = 20;
-    int textAlign = CENTER;
+    int fontSize = 20;
+    int align = CENTER;
     
-    GameText(String text, float x, float y, color textColor, int textSize)
+    GameText(String label, float x, float y, color textColor, int fontSize)
     {
         super(x, y, 0, 0);
-        this.text = text;
-        this.textSize = textSize;
+        this.label = label;
+        this.fontSize = fontSize;
         this.textColor = textColor;
     }
     
     void render()
     {
-        GameText_render(this);
+        fill(this.textColor);
+        textFont(Game.defaultFont, this.fontSize);
+        textAlign(this.align);
+        text(this.label, this.x, this.y);
     }
+    
 }
 
-// !! Another processing-js workaround.
-//    Calling txt.render() fails silently.
-//    Maybe it screws up javascript's "this" context?
-void GameText_render(GameText txt)
-{
-    fill(txt.textColor);
-    textFont(Game.defaultFont, txt.textSize);
-    textAlign(txt.textAlign);
-    text(txt.text, txt.x, txt.y);
-}
