@@ -1,39 +1,52 @@
-class GameGroup extends GameObject
+class GameGroup extends GameBasic
 {
-    ArrayList children = new ArrayList();
+    ArrayList members = new ArrayList();
 
     GameGroup()
     {
-        super(0,0,0,0);
+        super();
     }
     
-    GameObject add(GameObject obj)
+    GameBasic get(int i)
     {
-        this.children.add(obj);
+        return (GameBasic) this.members.get(i);
+    }
+    
+    GameBasic put(int i, GameBasic obj)
+    {
+        this.members.set(i, obj);
         return obj;
     }
-    
-    GameObject get(int i)
+
+    // for javaphiles:
+    GameBasic set(int i, GameBasic obj)
     {
-        return (GameObject) this.children.get(i);
-    }
-    
-    void remove(GameObject obj)
-    {
-        this.children.remove(obj);
+        return this.put(i, obj);
     }
     
     int size()
     {
-        return this.children.size();
+        return this.members.size();
     }
+
+    GameBasic add(GameBasic obj)
+    {
+        this.members.add(obj);
+        return obj;
+    }
+    
+    void remove(GameBasic obj)
+    {
+        this.members.remove(obj);
+    }
+    
     
     boolean isEmpty()
     {
         return this.size() == 0;
     }
     
-    GameObject atRandom()
+    GameBasic atRandom()
     {
         if (this.isEmpty()) return null;
         return this.get((int) random(this.size()));
@@ -41,19 +54,19 @@ class GameGroup extends GameObject
     
     void update()
     {
-        GameObject obj;
-        int len = this.children.size();
+        GameBasic obj;
+        int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
             obj = this.get(i);
-            if (obj.exists) obj.update();
+            if (obj.exists && obj.active) obj.update();
         }
     }
     
     void render()
     {
-        GameObject obj;
-        int len = this.children.size();
+        GameBasic obj;
+        int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
             obj = this.get(i);
@@ -63,16 +76,20 @@ class GameGroup extends GameObject
     
     void overlap(GameGroup other)
     {
-        int len = this.children.size();
+        // !! this will certainly crash if the group contains other groups
+        // TODO: see how flixel handles GameObject in .overlap()
+        // !! meanwhile, just don't use overlap() on nested groups.
+        
+        int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            GameObject a = this.get(i);
-            if (a.alive)
+            GameObject a = (GameObject) this.get(i);
+            if (a.active && a.exists)
             {
                 for (int j = 0; j < other.size(); ++j)
                 {
-                    GameObject b = other.get(j);
-                    if (b.alive && a.overlaps(b))
+                    GameObject b = (GameObject) other.get(j);
+                    if (b.active && b.exists && a != b && a.overlaps(b))
                     {
                         a.onOverlap(b);
                     }
@@ -82,33 +99,45 @@ class GameGroup extends GameObject
     }
     
     
-    GameObject firstDead()
+    GameBasic firstDead()
     {
-        int len = this.children.size();
+        int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            GameObject obj = this.get(i);
+            GameBasic obj = this.get(i);
             if (! obj.alive) return obj;
         }
         return null;
     }
     
-    GameObject firstAlive()
+    GameBasic firstAlive()
     {
-        int len = this.children.size();
+        int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            GameObject obj = this.get(i);
+            GameBasic obj = this.get(i);
             if (obj.alive) return obj;
         }
         return null;
     }
 
+    GameBasic firstInactive()
+    {
+        int len = this.members.size();
+        for (int i = 0; i < len; ++i)
+        {
+            GameBasic obj = this.get(i);
+            if (! obj.active) return obj;
+        }
+        return null;
+    }
+
+
     void removeDead()
     {
         while (true)
         {
-            GameObject body = firstDead();
+            GameBasic body = firstDead();
             if (body == null) { break; } else { remove(body); }
         }
     }

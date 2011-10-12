@@ -267,50 +267,154 @@ and now we the i vs j check is redundant
 
 
 * Part 2: Bullets
-** intro:
+** 2a. BulletDemo overview
+*** setup:
+- visual paradigm: BulletDemo.vpp  [on overlap page]
+- sketch invaders running
+- OverlapDemoLive running
+- GameStateDemo running
+- eclipse: Browse.java empty, OverlapDemoLive open
+
+*** quick recap/preview
 we're making sketch invaders (show)
 so far we have overlap detection (show)
 in this episode: fire with mouse to shoot at frame-animated invaders
+*** overlapdemo bird's eye view
+**** > show Overlap.pde in eclipse
+***** Eclipse is an IDE with a processing plugin.
+***** It's still pretty early in development.
+***** Really good for java, though.
+***** In fact, here's a trick:
+**** > paste code into Browse.java
+***** can't run it here
+***** but can see the structure
+****** Bounds
+****** Square
+****** top level processing methods
+**** another way to visualize the structure
+***** > show OverlapDemo in vpp
+***** this is a UML class diagram
+***** unified modeling language
+***** huge spec with all kinds of standard diagrams
+***** we're just going to look at class diagrams for now
+***** so here we have our two classes
+****** Bounds
+******* all the methods it has
+****** Square
+******* inherits all that (the arrow)
+******* and adds fillColor
+****** the other top-level methods like draw and mousePressed are gone
+******* they actually are part of a class 
+******* everything is really inside class OverlapDemo 
+******* but processing hides that, and so will we
 
-** start with overlap detection example
-get rid of mousereleased / mouse dragged, boxinhand, and the offsets
+**** Here's what we're building today
+***** > show BulletDemo tab
+***** the two white ones are like yesterday
+****** GameObject is just bounds renamed
+******* Added one method, onOverlap. It's just a placeholder.
+****** GameSquare is just Square
+***** We'll move Square's drawing code into GameRect
+****** GameRect is just a rectangle
+****** That way we can share the drawing code
+****** even though Bullets aren't square.
+***** GameGroup
+****** We used arrays last time
+****** GameGroup is like an array on steroids
+****** In particular, it's a class so we can 
+****** add all kinds of behavior to it, like:
+******* overlap()
+******* firstDead
+******* firstAlive
+***** GameBasic
+****** Just a nice top level class.
+****** All these other objects have their own way to update and render themselves
+******* GameObject is invisible, like Bounds was yesterday.
+******* GameRect draws a rectangle, but I added liveColor and deadColor
+******* GameGroup renders itself by rendering all its members
+*** That's the plan for now!
+**** Later today, we'll come back and look at the last diagram here.
+**** So stay tuned to the playlist!
+**** In the next video, we'll actually implement this code.
+We're actually write the code for this.
 
-leave mousepressed, but make it empty
+** 2b. GameObject and GameGroup
+*** setup
+- OverlapDemoLive open in studio sketchpad
+http://studio.sketchpad.cc/sp/pad/view/ro.96IuVs0RtADtP/latest
+- eclipse: have GameSketchLibDemo ready
+- have GameBasic diagram open
+- have 
+
+- save as BulletDemoLive
+
+*** factor out GameObject from yesterday's code
+**** > run OverlapDemoLive on sketchpad
+**** Link is below the video. Feel free to click clone and modify 
+**** I'm going to use the processing IDE
+**** but you can follow along in another browser window
+**** we'll keep the classes and draw
+**** but we don't need our old mouse stuff
+**** > delete mouseDragged and mouseReleased
+**** > leave mousepressed, but make it empty
 
 void mousePressed()
 {
     // TODO : fire new Bullet(mouseX, mouseY);
 }
 
-
-** what is a bullet?
-
-    class Bullet extends Rectangle
+**** what is a Bullet?
+***** > see UML
+***** > write code
+    class Bullet extends GameRect
     {
         Bullet(float x, float y)
         {
             super(x, y, 10, 20);
         }
     }
+    
+***** why not GameBullet?
+****** everything starting with game is going into a library
+****** bullet isn't quite generic enough.
 
-** extract Rectangle from Square
-
-    run to test
-
-
-
-** let's start with 10 bullets.
+**** what is a GameRect?
+***** well, it's some intermediate form between GameObject and GameSquare
+**** GameObject is just a new name for Bounds
+***** > rename it
+***** > rename constructor
+***** > we'll worry about GameBasic later
+**** Now we can make GameRect
+***** > rename Square to GameSquare
+***** > rename constructor
+***** > class GameRect extends GameObject
+***** > pull up render() and fillColor from GameSquare
+**** > make sure everything runs
+***** we deleted themouse stuff, but should be 9 squares
+*** Let's make some bullets
+***** > add kBulletW/H right above Bullet class
 final int kBulletW = 10;
 final int kBulletH = 20;
+***** update Bullet constructor
+super(x, y, kBulletW, kBulletH);
+***** what are these for?
+****** we can always make a bullet and check its .w and .h
+****** but you'll see in a minute we want the width and height
+****** before we actually make the instance
+****** really want this to be static in the Bullet class
+****** but processing doesn't like that.
 
-        super(x, y, kBulletW, kBulletH);
+***** let's start with 10 bullets.
+kBulletCount = 10;
+Bullet[] mBullets = new Bullet[kBulletCount];
 
-    for (int i = 0; i < kBulletCount; ++i)
-    {
-        mBullets[i] = new Bullet(kBulletW * i, height - kBulletH);
-    }
-
-** now to draw them
+for (int i = 0; i < kBulletCount; ++i)
+{
+    mBullets[i] = new Bullet(kBulletW * i, height - kBulletH);
+}
+***** see why we needed the width and height first?
+***** we're placing them in a little line in the bottom left
+***** now to draw them
 let's ignore the collision detection code up here for the time being,
 and just draw our bullets. We'll make them gold.
 
@@ -319,272 +423,356 @@ and just draw our bullets. We'll make them gold.
     {
         mBullets[i].render();
     }
-
-** so let's fire a bullet
-
-well... first we have to decide which one. let's take the first one for now.
+***** > run it 
+*** notice the duplicate work
+**** > extract the square rendering to make it explicit
+**** these two loops are exactly the same
+**** Yesterday we started to see how classes can eliminate duplication.
+***** Rather than having duplicate variables and if statements 
+***** to check each square for a click
+***** we made the Bounds class
+***** (now gameobject)
+***** and taught it how to tell whether it contained a point
+**** Wouldn't it be nice if we could teach these arrays to loop through and call render?
+***** well, we can't add methods to an array
+***** but we can make something LIKE an array
+***** that's what GameGroup is all about
+*** > GameGroup extends GameBasic
+**** > paste in GameBasic
+***** pretty much exactly like the diagram
+***** doesn't have any behavior
+***** just a placeholder
+***** doesn't even need a constructor
+***** DOES guarantee that we can call these methods on all our objects
+***** and they all have any of these states
+***** GameGroup might not need alive but it needs the others
+****** see, we want GameGroup to contain anything that's a GameBasic
+****** GameGroup itself is a GameBasic
+****** so we'll be able to put one GameGroup inside another
+****** So you could have one big group with smaller groups inside
+****** then you could hide or freeze whole groups at once 
+****** just by setting the value on the group.
+**** > make GameObject extend GameBasic
+*** GameGroup methods:
+**** > paste in: members, constructor, get, put, set, size, remove, size
+**** This is pretty much like an array.
+***** instead of brackets we have get and put
+****** set is just another word for put
+***** instead of length, we have size()
+***** but notice there's no size when we create it
+**** That's because instead of an array, we use ArrayList
+***** Arrays are fixed size
+***** ArrayLists can grow and shrink.
+***** > paste add
+***** > paste remove
+*** Replace our arrays with Groups
+**** > mBullets
+**** > mSquares
+**** > use add() in setup()
+**** > in draw, replace the loops with render()
+**** > just comment out the overlap detection
+***** the squares don't move anymore but we'll keep this around
+***** for reference for a little while
+**** > run it again
+*** next video: fire the bullets
+** 2c. Firing our Bullets
+*** setup
+- work in progress running
+*** > run it.
+*** so let's fire a bullet
+**** first we have to decide which bullet to fire
+**** let's take the first one for now.
 
 void mousePressed()
 {
-    Bullet b = mBullets[0];
+    Bullet b = mBullets.get(0)
+    // place it at the mouse x
     b.x = mouseX;
+    // but fire from below
     b.y = height - kBulletH * 2;
 }
 
-** now let's make it move.
-two parts: we want it to move, but we only want the one's we've fired to move.
-
-in Bullet:
-    boolean alive = false;
-    
-    float dy = -1;
-    float dx = 0;
-
+**** > run
+**** same bullet each time
+*** now let's make it move.
+**** two parts
+**** part one is to make it move
+***** > add floats dx and dy to GameObject
+****** d is for delta
+****** delta x means change in x
+****** if you take a physics or calculus class you'll see deltas all over the 
+***** we COULD add it to Bullet, but lots of things can move
+***** > write GameObject.update()
     void update()
     {
-        if (this.alive)
-        {
-            y += dy;
-            x += dx;
-        }
+        y += dy;
+        x += dx;
     }
-    
+***** Now in bullet constructor we can say
 
-now we need to make it alive when we fire it. let's make a
-new method for that.
+    kBulletSpeed = 1;
+    this.dy = -kBulletSpeed;
+***** but update isn't being called anywhere yet
+****** > put update() at the top of the draw for both groups
+***** > run it
+**** so part 2 is making sure only the bullets we've actually fired move
+***** > set **ACTIVE** to false in Bullet constructor # NOT ALIVE!
+***** > remember, the update method in GameGroup checks for alive before calling update.
+***** now we need to make it active when we fire it. 
+***** > let's make a new method for that.
 
     void fire(float x, float y)
     {
         this.x = x;
         this.y = y;
-        this.alive = true;
+        this.active = true;
     }
 
-
-and now we update mousePressed() to use the new interface:
+***** and now we update mousePressed() to use the new interface:
 
 void mousePressed()
 {
-    Bullet b = mBullets[0];
+    Bullet b = mBullets.get(0);
     b.fire(mouseX, height - kBulletH * 2);
 }
 
-
-at top of loop in draw:
-
-    for (int i = 0; i < kBulletCount; ++i)
-    {
-        mBullets[i].update();
-    }
-
-
-
-** okay, so that's too slow, and worse, it resets each time we fire
-
-// extract method:
-Bullet nextBullet()
+***** > run it
+*** our bullet jumps back down every time we click
+*** instead of the first bullet, we should get the first inactive one
+**** > paste in firstInactive
+***** > explain "return"
+***** > explain return null
+**** > call firstInactive to pick bullet
+**** > check for null
+**** > run it
+**** > use all the bullets
+*** out of bullets. that'll be a pretty short game!
+**** let's put them back in our ammo clip after they leave the top of the screen
+**** how do we know if a bullet is still on the screen or not?
+**** well, we learned how to do that yesterday
+***** > make SCREEN_BOUNDS
+GameObject SCREEN_BOUNDS;
+SCREEN_BOUNDS = new GameObject(0, 0, width, height);
+***** > deactivate the bullet in draw()
+if (! bullet.overlaps(SCREEN_BOUNDS))
 {
-    return mBullets[0];
+    bullet.active = false;
 }
+***** we could also put this in Bullet.update
+****** that's kind of a style choice.
+****** anything just about the object goes in the class
+****** but this is really more about the interactions between the bullet and this screen bounds object
+****** to me, interactions go into the main update loop
+****** which right now is called draw, but let's make it explicit real quick
+***** > extract update() and render() from draw()
+***** notice how the whole game has the same structure as GameBasic?
+***** that'll come in handy pretty soon.
+***** > run it
+***** yay, plenty of ammo now. but let's actually fill up the ammo clip
 
-
-Bullet nextBullet()
-{
-    for (int i = 0; i < kBulletCount; ++i)
-    {
-        if (! mBullets[i].alive)
-        {
-            return mBullets[i];
-        }
-    }
-    // always return a bullet so we don't have to check for null
-    return mBullets[0];
-}
-
-
-
-** recycling
-Bounds SCREEN_BOUNDS;
-
-SCREEN_BOUNDS = new Bounds(0, 0, width, height);
-
-
-            if (! bullet.overlaps(SCREEN_BOUNDS))
-            {
-                bullet.alive = false;
-            }
-
-
-
-we could put this in Bullet.update() but to me
-t's really more about the interaction between
-objects, and not the object itself.
-
-so let's make a game-wide update()
-
-
-** extract update() and render() from draw()
-
-
-we end up with this:
-
-void update()
-{
-    for (int i = 0; i < kBulletCount; ++i)
-    {
-        Bullet b = mBullets[i];
-        if (b.overlaps(SCREEN_BOUNDS))
-        {
-            b.update();
-        }
-        else
-        {
-            b.alive = false;
-        }
-    }
-}
-
-
-
-** now we can clean up our ammo display:
-
-    int bulletsLeft = 0;
-
-...
-
-        if (! b.alive)
-        {
-            b.x = kBulletW * bulletsLeft++;
-            b.y = height - kBulletH;
-        }
-
-
-
-** that's a lot of bullets, so let's speed them up and limit it to 5
-
+*** let's clean up the ammo display
+**** we want to just want to tack each one on the end as we reclaim it
+**** but we also want them to shift left
+**** it's easiest to just redraw the whole thing
+**** > paste the bullet cleanup loop over bullets.update()
+**** see, we need to track the bulletsLeft count across all the updates
+***** we could declare a top level variable and update it in Bullet.update
+***** but that gets really messy
+***** again, for me, logic that deals with multiple objcets goes in the game's update
+***** even if they're all the same class
+**** > walk through the loop.
+**** > run it
+*** that's a lot of bullets, so let's speed them up and limit it to 5
 final int kBulletCount = 3;
-
-// let's add this while we're at it:
-final float kBulletSpeed = -3.75;
+final float kBulletSpeed = 3.75;
 
 
-and in Bullet:
-
-    float dy = 0;
-    float dx = 0;
-        dy = kBulletSpeed;
-
-** and:
-
-int mBulletsLeft = kBulletCount;
-
-void mousePressed()
+*** finally, let's hit something
+**** here's our old overlap detection from last time
+**** let's review how it worked
+***** we had a loop to go through the array
+***** and another loop to go through the same array
+***** and we just checked every pair for overlaps
+**** well, now we want to compare two separate groups - bullets and squares
+***** we can just change one of the loops to use the other group
+***** but we're going to do this A LOT
+***** so we can just teach GameGroup to do it
+***** > delete the old code
+***** > paste in GameGroup.overlap
+***** you can see it's the same logic
+****** loop through one group
+****** loop through the other group
+****** make sure they're not the same object
+****** but it respects .active and .exists
+****** and instead of changing the color right there, we call a.onOverlap(b)
+****** onOverlap only applies to GameObjects
+******* that's why we cast with parentheses
+******* otherwise we'd have a GameBasic which doesn't have onOverlap
+******* so we have a bug with nested groups
+******* i'm trying to emulate flixel here,
+******* so i'll fix it later to do whatever flixel does
+******* we'll talk more about flixel next lesson
+******* but for now:
+******* just don't call overlap on groups that contain other groups.
+****** > make sure void onOverlap(GameObject other) { } is there
+***** so now we can use this to kill the squares
+****** > update: mBullets.overlap(mSquares);
+****** > Bullet.onOverlap
+void onOverlap(GameObject other)
 {
-    if (mBulletsLeft > 0)
-
-
-// in update, after the loop:
-    mBulletsLeft = bulletsLeft;
-
-
-
-** now let's fix collisions
-
-our collision code wound up in render() which is probably the wrong place.
-
-i put it there because of these fill calls, but now we have a better option.
-
-we can check for collisions with a bullet and then set an alive flag.
-
-this way we can draw the enemies exploding later, and have bullets pass through the anamation.
-
-so... that means we need to add the alive flag from bullet up into a superclass.
-
-in fact, let's actually make a new superclass for all our game objects.
-
-** GameObject
-
-we'll put it above rectangle, so:
-
-copy and paste Rectangle
-
-change the class and constructor name to GameObject
-
-add:
-    boolean alive = true;
-    float dx = 0;
-    float dy = 0;
-
-
-
-make render() empty
-
-add:
-
-    public void update()
-    {
-    }
-
-
-
-in Bullet, remove the variables but add to the constructor:
-
-alive = false;
-
-now all of our objects can be alive or dead, and we can:
-
-**  separate the overlap stuff from the render stuff.
-
-[scroll to the overlap logic]
-
-
-copy the  INSIDE part of the loop (the j stuff only)
- update()... right BEFORE "if (! b.alive) {}"
-
-scroll back down and replace the outer loop contents with:
-
-        fill(mSquares[i].alive ? #FFFFFF : #CCCCCC);
-        mSquares[i].render();
-
-
-[scroll back up]
-
-we actually don't care about the squares overlapping anymore
-and we don't care if bullets overlap each other
-we only care about bullets overlapping with the squares
-
-we're already in a loop that goes through the bullets,
-so we can just test this one bullet against b
-
-remove the i!=j
-
-        for (int j = 0; j < kSquareCount; ++j)
-        {
-            Square sq = mSquares[j];
-            if (sq.alive && b.overlaps(sq))
-            {
-                sq.alive = false;
-                b.alive = false;
-            }
-        }
-
-we don't need to do this loop if the bullet is dead
-
-if (b.alive)
-...
-else
-
-** and now we have something that's starting to feel a bit like space invaders!
-
-** That's all for this video.
-A lot of what we've done up to this point is really
-kind of universal to any game.
-
-So in the next video, we're going to take a step back
-and see if we can separate out the generic parts into
-a reusable framework.
-
-Seeya then!
+    this.alive = false;
+    other.alive = false;
+}
+***** one more thing before we can run it
+****** GameRect.render
+color liveColor = #FFFFFF;
+color deadColor = #CCCCCC;
+fill(this.alive ? this.liveColor : this.deadColor );
+***** > run it
+***** > kill ALL the squares
+*** this is starting to feel a bit like space invaders!
+**** That's all for this video.
+**** Next video we'll see how to add a title screen 
+**** and how to tell the game to start over after we kill the squares
+** 2d. Screenflow with GameState
+*** setup
+BulletDemoLive running
+vpp: open to BulletDemo tab
+empty Browse.java in eclipse
+*** so here's where we're at:
+**** > run BulletDemoLive
+**** we have some bullets and we can shoot the squares
+**** now we're going to add a title screen 
+**** and an option to restart after we kill everybody
+*** > paste the code into Browse.java
+**** if you recall, everything in our game has an update and a render
+**** some things just inherit the default implementations, which do nothing
+**** some override them to do other special things
+**** but everything uses that same interface.
+**** in fact, the main loop of the whole game object just calls those two methods
+**** remember (BulletDemo) is itself one big java class
+**** and look at render here: we're just calling render on two sub-objects
+**** really, BulletDemo as an object looks quite a bit like a GameGroup.
+*** what would happen if we made our whole game into a GameGroup?
+**** Let's find out!
+**** Here's what I propose.
+**** > open vpp to GameStateDemo
+**** We can create a GameState class that is exactly like GameGroup
+***** except it draws a background before it renders
+***** and it has methods for everything we're doing with the mouse
+*** so then we could make different kinds of states
+**** so we could make a menu state
+***** and it could contain a bunch of text objects
+***** so when it renders, you see words on the screen
+***** we could have it say "click here to start the game"
+***** and then the mousePressed event, we could switch to the PlayState
+**** then in our PlayState we'd have the game
+***** render would call the render method on our squares and bullets
+***** and update would update the game just like it does now
+**** at the very top level
+***** we'd start with a variable of type GameState to hold the current state
+***** then instead of just calling top-level update() and render() methods
+****** the top level draw() would call currentState.update() and currentState.render()
+****** and since GameStates would be GameGroups...
+****** they would already know how to update and render whatever's inside them
+***** the top level mousePressed would the state's mousepressed method
+***** the top level mouseReleased would call the state's mouseReleased
+*** it turns out this is a pretty handy way to organize a game
+*** so we're going to do it!
+*** and just so we can package it up nicely 
+**** we'll keep the current state 
+**** and the state-switching logic
+**** in a special container object called Game
+*** So that's the plan. Let's do it!
+*** First up: GameState
+**** > paste GameState
+**** the create method here is just a place to do setup stuff
+***** it's basically the same as setup for a processing sketch
+***** I called it create instead of setup because 
+***** i'm trying to make this like the flixel game library for flash
+***** and flixel calls it create
+**** render just uses GameGroup's render
+***** after it clears the screen with the background color
+**** we don't need to change update at all, so it just inherits the one from GameGroup
+**** and then we add all these empty mouse handlers
+***** these might go away
+***** i've already done something else with the keyboard methods
+****** i generalized the keyboard stuff from last week
+****** and now there's a universal keyboard event handler
+****** which we'll take a look at later
+***** I may do something similar for the mouse
+***** but for now we'll just override mousePressed in each state
+**** > create empty PlayState
+**** > put the game inside it
+**** ! setup should only have size(300, 300); and nothing else
+**** > run. (should do nothing now)
+**** > paste in Game
+***** Game isn't really a class, it's an object
+****** But it's the only instance of class GameClass we need.
+****** In java or actionscript, we'd use a class with the static keyword
+****** But processing doesn't like that, so I just did this.
+***** The code is pretty straightforward
+****** Game.state is the current state
+****** Game.bounds is exactly the same as what we called SCREEN_BOUNDS
+****** will init() gets called once in setup
+****** after that you can use switchState() to change states
+****** and it'll call the create method so the state can set itself up.
+**** Now we can go back and add the top level methods for processing
+***** > paste draw and mouseXXX
+***** hopefully no surprises there.
+***** everything just delegates to the current state object
+***** and now we just pass it our PlayState
+***** > do so, and run [ game should run as before ]
+**** Now let's add the Menu Screen...
+***** > MenuState extends GameState
+***** > paste in mousePressed but NOT render
+***** > change setup to use MenuState
+***** > run [ should see black screen and then click gives us the game]
+**** not much of a menu yet
+***** That's where GameText comes in
+****** > paste GameText
+****** basically this just wraps the normal text drawing routines for processing
+******* if you notice, there's a line about a default font commented out
+******* processing and processing-js handle fonts differently
+******* we'll take a closer look at this class next time
+****** for now, the important thing is that it's a GameObject 
+****** and that means we can add it to a GameGroup or a GameState
+****** so let's add some text to our main menu screen
+****** > paste MenuState. create()
+****** > run
+**** last thing. let's make the game start over when we kill all the squares
+***** > paste firstAlive() line in update()
+***** if there are no living squares go back to the title state
+***** except we didn't implement firstAlive yet
+***** but it's exactly the same as firstInactive
+***** except for the check
+***** > copy and paste from firstInactive
+***** I really don't like this.
+****** In a lot of languages we can pass a function in as a parameter
+****** it's called a lambda or an anonymous function
+****** but processing is based on java, and java doesn't have lambdas yet
+******* apparently, they're finally coming in java 8
+******* so maybe processing will get them
+****** for now, java has something called anonymous classes
+****** but they take almost as much code to write as these loops
+****** we might try them at some point, but this will do for now.
+***** in any case, people using the GameGroup class only have to call the methods
+***** all the ugly repetition is hidden away
+**** so now that we have firstAlive...
+***** game should start over when we shoot all the squares
+***** > run it
+**** that's all for today
+***** I'll put this code up on studio sketchpad so you can run it right in your browser
+***** and make sure there's a link in the video description on youtube.
+***** Next time, we'll pack all this GameObject stuff up into a library
+***** and we'll start work on the actual Space Invaders GameSketch.
+**** thanks for watching
+***** if you like these lessons
+***** please subscribe to the channel
+***** and leave a comment
+***** letting me know what you like and don't like about these videos
+***** Thanks!
+***** See you soon.
 
 
 * part 3 lecture : A Game Sketch Library

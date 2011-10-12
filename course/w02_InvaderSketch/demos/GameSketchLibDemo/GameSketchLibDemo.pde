@@ -1,18 +1,40 @@
  /*
-  * GameSketchLibDemo for InvaderSketch Tutorial
+  * BulletDemo for InvaderSketch Tutorial
   *
   * video: http://www.youtube.com/playlist?list=PL9164D8831A48D0DE&feature=viewall
   *
   */
   
- class Bounds
+class GameBasic
+{
+    // these are straight out of flixel
+    boolean visible = true; // if false: GameGroup won't ask it to render()
+    boolean active = true;  // if false: GameGroup won't ask it to update()
+    boolean exists = true;  // if false: GameGroup won't ask for either.
+    boolean alive = true;   // this one is just handy in games
+     
+    public void update()
+    {
+    }
+    
+    public void render()
+    {
+    }
+}
+
+
+  
+ class GameObject extends GameBasic
  {
      public float x = 0;
      public float y = 0;
      public float w = 0;
      public float h = 0;
 
-     Bounds(float x, float y, float w, float h)
+     float dx = 0;
+     float dy = 0;
+
+     GameObject(float x, float y, float w, float h)
      {
          this.x = x;
          this.y = y;
@@ -43,36 +65,8 @@
                  this.y < that.y2() && this.y2() > that.y);
      }
 
-     /* exercise:
-     public boolean contains(Bounds that)
-     {
-         return this.x <= that.x
-             && this.y <= that.y
-             && this.x2() >= that.x2()
-             && this.y2() >= that.y2();
-     }
-     */
  }
 
-
- class GameObject extends Bounds
- {
-     boolean alive = true;
-     float dx = 0;
-     float dy = 0;
-
-     GameObject (float x, float y, float w, float h)
-     {
-         super(x, y, w, h);
-     }
-
-     public void render()
-     {
-     }
-
-     public void update()
-     {
-     }
 
      public void onOverlap(GameObject other)
      {
@@ -81,95 +75,112 @@
 
  class GameGroup extends GameObject
  {
-     ArrayList children = new ArrayList();
+     ArrayList members = new ArrayList();
 
      GameGroup()
      {
          super(0,0,0,0);
      }
 
-     GameObject add(GameObject obj)
+     GameBasic add(GameBasic obj)
      {
-         this.children.add(obj);
+         this.members.add(obj);
          return obj;
      }
 
-     GameObject get(int i)
+     GameBasic get(int i)
      {
-         return (GameObject) this.children.get(i);
+         return (GameBasic) this.members.get(i);
      }
 
-     void remove(GameObject obj)
+     void remove(GameBasic obj)
      {
-         this.children.remove(obj);
+         this.members.remove(obj);
      }
 
      int size()
      {
-         return this.children.size();
+         return this.members.size();
      }
 
-     void update()
+    void update()
+    {
+        GameBasic obj;
+        int len = this.members.size();
+        for (int i = 0; i < len; ++i)
+        {
+            obj = this.get(i);
+            if (obj.exists && obj.active) obj.update();
+        }
+    }
+    
+    void render()
+    {
+        GameBasic obj;
+        int len = this.members.size();
+        for (int i = 0; i < len; ++i)
+        {
+            obj = this.get(i);
+            if (obj.exists && obj.visible) obj.render();
+        }
+    }
+ 
+    void overlap(GameGroup other)
+    {
+        // !! this will certainly crash if the group contains other groups
+        // TODO: see how flixel handles GameObject in .overlap()
+        // !! meanwhile, just don't use overlap() on nested groups.
+        
+        int len = this.members.size();
+        for (int i = 0; i < len; ++i)
+        {
+            GameObject a = (GameObject) this.get(i);
+            if (a.active && a.exists)
+            {
+                for (int j = 0; j < other.size(); ++j)
+                {
+                    GameObject b = (GameObject) other.get(j);
+                    if (b.active && b.exists && a != b && a.overlaps(b))
+                    {
+                        a.onOverlap(b);
+                    }
+                }
+            }
+        }
+    }
+
+     GameBasic firstDead()
      {
-         int len = this.children.size();
+         int len = this.members.size();
          for (int i = 0; i < len; ++i)
          {
-             this.get(i).update();
-         }
-     }
-
-     void render()
-     {
-         int len = this.children.size();
-         for (int i = 0; i < len; ++i)
-         {
-             this.get(i).render();
-         }
-     }
-
-     void overlap(GameGroup other)
-     {
-         int len = this.children.size();
-         for (int i = 0; i < len; ++i)
-         {
-             GameObject a = this.get(i);
-             if (a.alive)
-             {
-                 for (int j = 0; j < other.size(); ++j)
-                 {
-                     GameObject b = other.get(j);
-                     if (b.alive && a.overlaps(b))
-                     {
-                         a.onOverlap(b);
-                     }
-                 }
-             }
-         }
-     }
-
-
-     GameObject firstDead()
-     {
-         int len = this.children.size();
-         for (int i = 0; i < len; ++i)
-         {
-             GameObject obj = this.get(i);
+             GameBasic obj = this.get(i);
              if (! obj.alive) return obj;
          }
          return null;
      }
 
-     GameObject firstAlive()
+     GameBasic firstAlive()
      {
-         int len = this.children.size();
+         int len = this.members.size();
          for (int i = 0; i < len; ++i)
          {
-             GameObject obj = this.get(i);
+             GameBasic obj = this.get(i);
              if (obj.alive) return obj;
          }
          return null;
      }
 
+    GameBasic firstInactive()
+    {
+        int len = this.members.size();
+        for (int i = 0; i < len; ++i)
+        {
+            GameBasic obj = this.get(i);
+            if (! obj.active) return obj;
+        }
+        return null;
+    }
 
  }
 
@@ -192,18 +203,16 @@
      void mousePressed() { }
      void mouseReleased() { }
      void mouseMoved() { }
-     void keyPressed() { }
-     void keyReleased() { }
  }
 
- class GameSketchLib
+ class GameClass
  {
      GameState state;
-     Bounds bounds = new Bounds(0,0,0,0);
+     GameObject bounds;
 
      void init(GameState newState)
      {
-         Game.bounds = new Bounds(0, 0, width, height);
+         Game.bounds = new GameObject(0, 0, width, height);
          switchState(newState);
      }
 
@@ -214,7 +223,7 @@
      }
  }
  // simulating a static class:
- GameSketchLib Game = new GameSketchLib();
+ GameClass Game = new GameClass();
 
 
 
@@ -320,6 +329,7 @@
      void update()
      {
          mBullets.overlap(mSquares);
+         
          int bulletsLeft = 0;
          for (int i = 0; i < kBulletCount; ++i)
          {
@@ -332,31 +342,60 @@
                  b.y = height - kBulletH;
              }
          }
-         mBulletsLeft = bulletsLeft;
+         //mBulletsLeft = bulletsLeft;
+         
          if (mSquares.firstAlive() == null) { Game.switchState(new TitleState()); }
      }
 
      void mousePressed()
      {
-         if (mBulletsLeft > 0)
-         {
-             mBulletsLeft--;
+         //if (mBulletsLeft > 0)
+         //{
+         //    mBulletsLeft--;
              Bullet b = (Bullet) mBullets.firstDead();
-             b.fire(mouseX, height - kBulletH * 2);
-         }
+             if (b != null)
+             {
+             	b.fire(mouseX, height - kBulletH * 2);
+             }
+         //}
      }
  }
+ 
+ class GameText extends GameObject
+{
+    String label;
+    color textColor;
+    int fontSize = 20;
+    int align = CENTER;
+    
+    GameText(String label, float x, float y, color textColor, int fontSize)
+    {
+        super(x, y, 0, 0);
+        this.label = label;
+        this.fontSize = fontSize;
+        this.textColor = textColor;
+    }
+    
+    void render()
+    {
+        fill(this.textColor);
+        textSize(this.fontSize); // textFont(Game.defaultFont, this.fontSize);
+        textAlign(this.align);
+        text(this.label, this.x, this.y);
+    }
+    
+}
+ 
 
 
- class TitleState extends GameState
+ class MenuState extends GameState
  {
-     void render()
-     {
-         background(0);
-         textSize(16);
-         fill(255);
-         text("GameGroups Demo. Click to start.", 10, 50);
-     }
+ 	 void create()
+ 	 {
+ 	 	this.add(new GameText(
+ 	 		"BulletDemo! Click to start.",
+ 	 		 10, 50, #FFFFFF, 16));
+ 	 }
 
      void mousePressed()
      {
@@ -368,7 +407,7 @@
  void setup()
  {
      size(300, 300);
-     Game.init(new TitleState());
+     Game.init(new MenuState());
  }
 
  void draw()
@@ -380,5 +419,3 @@
  void mousePressed()  { Game.state.mousePressed(); }
  void mouseReleased() { Game.state.mouseReleased(); }
  void mouseMoved()    { Game.state.mouseMoved(); }
- void keyPressed()    { Game.state.keyPressed(); }
- void keyReleased()   { Game.state.keyReleased(); }

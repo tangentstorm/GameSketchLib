@@ -4,7 +4,7 @@
 class GameClass
 {
     GameState state;
-    GameBounds bounds;
+    GameObject bounds;
     PFont defaultFont;
     GameKeys keys = new GameKeys();
     
@@ -19,7 +19,7 @@ class GameClass
         Game.defaultFont = 
             CONFIG_JVM ? loadFont("DejaVuSans-48.vlw")
                        : loadFont("Arial");
-        Game.bounds = new GameBounds(0, 0, width, height);
+        Game.bounds = new GameObject(0, 0, width, height);
         switchState(newState);
     }
     
