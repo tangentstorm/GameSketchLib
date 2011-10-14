@@ -31,7 +31,7 @@ final String chunks[] =
   kSpliceLibStart  ,
   kSpliceMainFile  , // "GameSketchLib.pde"
   "Game.pde"       ,
-  "GameBounds.pde" ,
+  "GameBasic.pde"  ,
   "GameGroup.pde"  ,
   "GameKeys.pde"   ,
   "GameMath.pde"   ,

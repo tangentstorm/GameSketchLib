@@ -44,6 +44,7 @@ char[] WASD_E  = new char[] { 'D', 'd', 'E', 'e' };
 void mousePressed()  { Game.state.mousePressed();  }
 void mouseReleased() { Game.state.mouseReleased(); }
 void mouseMoved()    { Game.state.mouseMoved();    }
+void mouseDragged()  { Game.state.mouseDragged();  }
 void keyPressed()    { Game.keys.setKeyDown(true); }
 void keyReleased()   { Game.keys.setKeyDown(null); }
 

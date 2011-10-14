@@ -15,6 +15,7 @@ class GameState extends GameGroup
     // empty event handlers:
     void mousePressed() { }
     void mouseReleased() { }
+    void mouseDragged()  { }
     void mouseMoved() { }
     void keyPressed() { } 
     void keyReleased() { }

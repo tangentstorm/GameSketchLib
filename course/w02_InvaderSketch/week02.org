@@ -276,11 +276,13 @@ and now we the i vs j check is redundant
 - eclipse: Browse.java empty, OverlapDemoLive open
 
 *** quick recap/preview
-we're making sketch invaders (show)
-so far we have overlap detection (show)
-in this episode: fire with mouse to shoot at frame-animated invaders
-*** overlapdemo bird's eye view
-**** > show Overlap.pde in eclipse
+this is week 2, lesson 2 of the GameSketch beginning game development series
+this week, we're working our way up to a space invaders clone (show)
+so far we've got some squares that know about overlap detection (show)
+today, we'll use that samee logic to check
+whether we're hit the squares when we shoot them with these bullets
+*** let's look at the code we've written so far
+**** > show OverlapLive.pde in eclipse
 ***** Eclipse is an IDE with a processing plugin.
 ***** It's still pretty early in development.
 ***** Really good for java, though.
@@ -424,6 +426,8 @@ and just draw our bullets. We'll make them gold.
         mBullets[i].render();
     }
 ***** > run it 
+**** that's a good place to stop
+** 2c. GameGroup
 *** notice the duplicate work
 **** > extract the square rendering to make it explicit
 **** these two loops are exactly the same
@@ -475,7 +479,7 @@ and just draw our bullets. We'll make them gold.
 ***** for reference for a little while
 **** > run it again
 *** next video: fire the bullets
-** 2c. Firing our Bullets
+** 2d. Firing our Bullets
 *** setup
 - work in progress running
 *** > run it.
@@ -634,7 +638,7 @@ fill(this.alive ? this.liveColor : this.deadColor );
 **** That's all for this video.
 **** Next video we'll see how to add a title screen 
 **** and how to tell the game to start over after we kill the squares
-** 2d. Screenflow with GameState
+** 2e. Screenflow with GameState
 *** setup
 BulletDemoLive running
 vpp: open to BulletDemo tab

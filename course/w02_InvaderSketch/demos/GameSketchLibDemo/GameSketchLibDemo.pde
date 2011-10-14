@@ -59,13 +59,13 @@ class GameBasic
      }
 
      // http://stackoverflow.com/questions/306316/determine-if-two-Squares-overlap-each-other
-     public boolean overlaps(Bounds that)
+     public boolean overlaps(GameObject that)
      {
          return (this.x < that.x2() && this.x2() > that.x &&
                  this.y < that.y2() && this.y2() > that.y);
      }
 
- }
+
 
 
      public void onOverlap(GameObject other)
@@ -77,10 +77,28 @@ class GameBasic
  {
      ArrayList members = new ArrayList();
 
-     GameGroup()
+     GameBasic get(int i)
      {
-         super(0,0,0,0);
+         return (GameBasic) this.members.get(i);
      }
+     
+     GameBasic put(int i, GameBasic obj)
+     {
+         this.members.set(i, obj);
+         return obj;
+     }
+     
+     GameBasic set(int i, GameBasic obj)
+     {
+         return this.put(i, obj);
+     }
+     
+     int size()
+     {
+         return this.members.size();
+     }
+
+
 
      GameBasic add(GameBasic obj)
      {
@@ -88,20 +106,12 @@ class GameBasic
          return obj;
      }
 
-     GameBasic get(int i)
-     {
-         return (GameBasic) this.members.get(i);
-     }
 
      void remove(GameBasic obj)
      {
          this.members.remove(obj);
      }
 
-     int size()
-     {
-         return this.members.size();
-     }
 
     void update()
     {
@@ -344,7 +354,7 @@ class GameBasic
          }
          //mBulletsLeft = bulletsLeft;
          
-         if (mSquares.firstAlive() == null) { Game.switchState(new TitleState()); }
+         if (mSquares.firstAlive() == null) { Game.switchState(new MenuState()); }
      }
 
      void mousePressed()
@@ -366,7 +376,7 @@ class GameBasic
     String label;
     color textColor;
     int fontSize = 20;
-    int align = CENTER;
+    int align = LEFT;
     
     GameText(String label, float x, float y, color textColor, int fontSize)
     {

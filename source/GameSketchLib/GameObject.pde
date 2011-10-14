@@ -57,6 +57,7 @@ class GameObject extends GameBasic
             && this.y2() >= that.y2();
     }
     
+    @Override
     public void update()
     {
         x += dx;

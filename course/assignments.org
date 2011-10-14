@@ -1,7 +1,7 @@
-#+TITLE: GameSketch Newbie GameDev Course
+#+TITLE: GameSketch Beginner Game Programming Course
 #+TODO: ISSUE TODO STARTED | DONE HOMEWORK
 
-* "Making Simple Games With Processing"
+* GameSketch Course: Making Games With Processing
 ------------------------------------------
  Your Host: [[http://michaljwallace.com/][Michal J. Wallace]]
 Video link: http://www.youtube.com/user/tangentstorm
@@ -10,8 +10,8 @@ Live demos: http://studio.sketchpad.cc/sp/padlist/edited-by?editorId=1181
 Contact me: michal.wallace [at] gmail.com
  on Reddit: tangentstorm
 
-* Based on the U. of Reddit Game Programming Course
-------------------------------------------
+* Loosely following the U. of Reddit Game Programming Course
+----------------------------------------------------------
 Instructor: SquashMonster
 Course URL: http://ureddit.com/class/268
  SubReddit: [[http://reddit.com/r/learngameprogramming/][/r/learngameprogramming/]]
@@ -50,10 +50,10 @@ Corresponds to: [[http://www.reddit.com/r/learngameprogramming/comments/l2tir/le
 *** TODO Remove destroyed objects from the game
 *** TODO has at least three variants of at least one of the above
 ** Lesson Plan
-*** STARTED Part 1: Intro, OverlapDemo
-*** TODO Part 2: BulletDemo
-*** TODO Part 3: GameSketchLib
-*** TODO Part 4: InvaderSketch
+*** DONE Lesson 1: Intro, OverlapDemo
+*** STARTED  2: BulletDemo
+*** TODO Lesson 3: GameSketchLib
+*** TODO Lesson 4: InvaderSketch
 
 
 
