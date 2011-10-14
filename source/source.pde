@@ -32,9 +32,13 @@ final String chunks[] =
   kSpliceMainFile  , // "GameSketchLib.pde"
   "Game.pde"       ,
   "GameBasic.pde"  ,
+  "GameContainer.pde",
+  "GameDroid.pde"  ,
   "GameGroup.pde"  ,
+  "GameGrid.pde"   ,
   "GameKeys.pde"   ,
   "GameMath.pde"   ,
+  "GameNull.pde"   ,
   "GameObject.pde" ,
   "GameRect.pde"   ,
   "GameSheet.pde"  ,

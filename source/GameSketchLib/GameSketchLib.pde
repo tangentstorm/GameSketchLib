@@ -48,12 +48,4 @@ void mouseDragged()  { Game.state.mouseDragged();  }
 void keyPressed()    { Game.keys.setKeyDown(true); }
 void keyReleased()   { Game.keys.setKeyDown(null); }
 
-// This figures out which runtime we're using dynamically,
-// so we can do conditional compilation.
- 
-final boolean CONFIG_PJS = (new Object()).toString() == "[object Object]";
-final boolean CONFIG_JVM = !CONFIG_PJS;
-final String RUNTIME_JVM = "JVM";
-final String RUNTIME_PJS = "PJS";
-final String RUNTIME = CONFIG_PJS ? RUNTIME_PJS : RUNTIME_JVM;
 
