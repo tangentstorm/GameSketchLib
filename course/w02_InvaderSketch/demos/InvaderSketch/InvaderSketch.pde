@@ -1,29 +1,79 @@
-
+/* @pjs preload="/static/uploaded_resources/p.1181/invaders.png"; */
 /*
- * InvaderSketch
- * http://github.com/sabren/GameSketchLib
+ * InvaderSketch!
+ *     by Michal J Wallace
+ *     twitter: @tangentstorm
+ *
+ * Live demo at studio.sketchpad.cc:
+ *
+ *     http://studio.sketchpad.cc/sp/pad/view/ro.9bi5HFOFBWaAa/latest
+ * 
+ * Created with GameSketchLib, an open-source game engine for processing.
+ *
+ *     http://gamesketchlib.org/
+ *
+ * Video lessons about this game:
+ *
+ *     http://www.youtube.com/playlist?list=PL9164D8831A48D0DE&feature=viewall
+ *
+ * This game was inspired by the legendary arcade classic,
+ * "Space Invaders" by Tomohiro Nishikado (Taito, 1978)
+ *
+ *     http://en.wikipedia.org/wiki/Space_Invaders
  *
  */
 
+String PJS_URL = "/static/uploaded_resources/p.1181";
+
 void setup()
 {
-    size(640, 480);
-
-    DEBUG = false;
-    SHEET = new GameSheet("invaders.png", 50, 50, "");
+    DEBUG = true;
+    
+    SHEET = new GameSheet("invaders.png", 50, 50, PJS_URL);
+    
+    Game.size(640, 480);
     Game.init(DEBUG ? new PlayState()
                     : new MenuState());
 }
 
+
+class CrazyText extends GameText
+{
+    CrazyText(String label, float x, float y, color c, int fontSize)
+    {
+        super(label, x, y, c, fontSize);
+    }
+    
+    private GameTimer mCrazyTimer = new GameTimer(SECONDS/10);
+    public void render()
+    {
+       if (mCrazyTimer.checkReady()) 
+           this.textColor = color(127 + random(127), 127 + random(127), 127 + random(127));
+       super.render();               
+    }
+}
+
+
 class MenuState extends GameState
 {
+   GameLink mLink;
+   
    void create()
    {
-       add(new GameText("InvaderSketch",
-                        Game.bounds.w /2, 100, #FFFFFF, 18));
+       add(new CrazyText("InvaderSketch!", Game.bounds.w /2, 100, #FFFFFF, 48));
+       add(new GameText("Part of the GameSketchLib Tutorial Series",
+                        Game.bounds.w /2, 150, #CCCCCC, 12));
+   
+       mLink = (GameLink) add(new GameLink(
+              "www.GameSketchLib.org",
+              "http://gamesketchlib.org",
+              Game.bounds.w /2, 200, #9999FF, 18));
+              
+       add(new GameText("Use the Arrow Keys to Move, Space to Shoot",
+                        Game.bounds.w / 2, 300, #FFFFFF, 18));
                         
-       add(new GameText("Press space to Begin",
-                        Game.bounds.w / 2, 150, #CCCCCC, 12));
+       add(new GameText("Press Space to Start",
+                        Game.bounds.w / 2, 360, #CCCCCC, 18));
    }
    
    void update()
@@ -33,6 +83,18 @@ class MenuState extends GameState
            Game.switchState(new PlayState());
        }
    }
+   
+   void mouseMoved()
+   {
+       mLink.hover = mLink.bounds.containsPoint(mouseX, mouseY);
+       cursor( mLink.hover ? HAND : ARROW );
+   }
+   
+   void mousePressed()
+   {
+       if (mLink.hover) mLink.click();
+   }
+   
 }
 
 
@@ -96,7 +158,7 @@ class PlayState extends GameState
     {
       
        // create the hero and put him in his group       
-       mHero = new HeroSprite(width/2 - 25, height - 50);
+       mHero = new HeroSprite(Game.bounds.w/2 - 25, Game.bounds.h - 50);
        mHeroGroup.add(mHero);
        
        // our bullets and fixed ammo display from BulletDemo
@@ -104,18 +166,18 @@ class PlayState extends GameState
 
        // generate the enemies:
        int row = 0;
-       for (int y = 25; y < height - 100; y += 75, row++)
+       for (int y = 25; y < Game.bounds.h - 100; y += 75, row++)
        {
-         for (int x = 65; x < width - 50; x += 75)
+         for (int x = 65; x < Game.bounds.w - 50; x += 75)
          {
              switch(row)
              {
+               case 0:
+                 mInvaders.add(mShipInvaders.add(new ShipInvader(x, y)));
+                 break;
                case 1:
                case 3:
                  mInvaders.add(new SpinInvader(x, y));
-                 break;
-               case 0:
-                 mInvaders.add(mShipInvaders.add(new ShipInvader(x, y)));
                  break;
                case 2:
                  mInvaders.add(new JellInvader(x, y));
@@ -130,7 +192,7 @@ class PlayState extends GameState
        int[] shieldXs = new int[] { 50, 100, 150, 250, 300, 350, 450, 500, 550 };
        for (int i = 0; i < shieldXs.length; ++i)
        {
-           mShields.add(new Shield(shieldXs[i], height - 125));
+           mShields.add(new Shield(shieldXs[i], Game.bounds.h - 125));
        }
        
        
@@ -160,7 +222,7 @@ class PlayState extends GameState
         if (Game.keys.justPressed(SPACE)) { shoot(); }
         if (Game.keys.goW()) { mHero.x -= kHeroSpeed; }
         if (Game.keys.goE()) { mHero.x += kHeroSpeed; }
-        mHero.x = GameMath.clamp(mHero.x, 0, width - mHero.w);
+        mHero.x = GameMath.clamp(mHero.x, 0, Game.bounds.w - mHero.w);
         
         if (Game.keys.justPressed('r'))
         {
@@ -201,7 +263,7 @@ class PlayState extends GameState
              if (! b.alive)
              {
                  b.x = kBulletW * bulletsLeft++;
-                 b.y = height - kBulletH;
+                 b.y = Game.bounds.h - kBulletH;
              }
          }
          mBulletsLeft = bulletsLeft;
@@ -243,7 +305,7 @@ class PlayState extends GameState
                      g.y += mFleetSpeedY;
                      
                      // game over if one gets within 100px of the bottom
-                     if (g.y >= height - g.h * 2) Game.switchState(new GameOverState());
+                     if (g.y >= Game.bounds.h - g.h * 2) Game.switchState(new GameOverState());
                  }
              }
          }
@@ -288,7 +350,8 @@ class ShipInvader extends GameSprite
 {
     ShipInvader(int x, int y)
     {
-        super(x, y, SHEET.getFrame(1));
+        super(x, y);
+        sheetFrames(new int[] { 1 });
     }    
 }
 
@@ -297,10 +360,11 @@ class ShipInvader extends GameSprite
 class SpinInvader extends GameSprite
 {
     float angleDelta = 2.5;
-  
+    
     SpinInvader(int x, int y)
     {
-        super(x, y, SHEET.getFrames(new int[] { 2, 3 }));
+        super(x, y);
+        sheetFrames(new int[] { 2, 3 });
         randomize();
         this.degrees = (int) random(-60, 60);
     }
@@ -324,7 +388,8 @@ class JellInvader extends GameSprite
     
     JellInvader(int x, int y)
     {
-        super(x, y, SHEET.getFrames(new int[] { 8, 9, 10, 11 }));
+        super(x, y);
+        sheetFrames(new int[] { 8, 9, 10, 11 });
         randomize();
         this.dy = 1;
         this.yDrift = random(-10, 10);
@@ -345,9 +410,11 @@ class JellInvader extends GameSprite
 
 class Shield extends GameSprite
 {
+
     Shield(float x, float y)
     {
-        super(x, y, SHEET.getFrames(new int[] { 12, 13, 14 }));
+        super(x, y);
+        sheetFrames(new int[] { 12, 13, 14  });
         this.animated = false;
         this.health = 3;
     }
@@ -363,7 +430,8 @@ class HeroSprite extends GameSprite
 {
     HeroSprite(float x, float y)
     {
-       super(x, y, SHEET.getFrame(0));
+       super(x, y);
+       sheetFrames(new int[] { 0 });
     }
     
     void onDeath()
@@ -375,13 +443,15 @@ class HeroSprite extends GameSprite
 
  class Bullet extends GameSprite
  {
-     GameBounds trueBounds = new GameBounds(0,0,0,0);
-   
+     GameObject trueBounds = new GameObject();
+
      Bullet(float x, float y)
      {
-         super(x, y, SHEET.getFrame(4));
+         super(x, y);
+         sheetFrames(new int[] { 4 });
          alive = false;
      }
+  
 
      void update()
      {
@@ -404,7 +474,7 @@ class HeroSprite extends GameSprite
          this.alive = true;
      }
 
-     boolean overlaps(GameBounds other)
+     boolean overlaps(GameObject other)
      {
          return this.trueBounds.overlaps(other);
      }
@@ -421,7 +491,7 @@ class EnemyBullet extends Bullet
      EnemyBullet(float x, float y)
      {
          super(x, y);
-         setFrames(SHEET.getFrames( new int[] { 5 }));
+         sheetFrames(new int[] { 5 });
          alive = true;
      }
 }

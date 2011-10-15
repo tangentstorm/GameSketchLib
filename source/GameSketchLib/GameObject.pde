@@ -13,6 +13,11 @@ class GameObject extends GameBasic
     float dy = 0;
     float health = 1;
     
+    GameObject()
+    {
+        reset(0,0,0,0);
+    }
+    
     GameObject(float x, float y, float w, float h)
     {
         reset(x, y, w, h);

@@ -10,18 +10,10 @@ class GameSprite extends GameObject
     int degrees = 0;    
     float xOffset = 0;
     float yOffset = 0;
-    
-    GameSprite(float x, float y, PImage[] frames)
+    GameSprite(float x, float y)
     {
         super(x, y, 0, 0);
-        setFrames(frames);
         animated = true;
-    }
-
-    GameSprite(float x, float y, PImage still)
-    {
-        super(x, y, 0, 0);
-        setFrames(new PImage[] { still });
     }
     
     void setFrames(PImage[] frames)
@@ -29,6 +21,12 @@ class GameSprite extends GameObject
         mFrames = frames;
         sizeToFrame();
     }
+    
+    void sheetFrames(int[] frameNums)
+    {
+        this.setFrames(SHEET.getFrames(frameNums));
+    }
+    
     
     void sizeToFrame()
     {
@@ -82,3 +80,4 @@ class GameSprite extends GameObject
         }
     }
 }
+

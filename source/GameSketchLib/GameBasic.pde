@@ -34,10 +34,9 @@ class GameBasic
      * GameContainer uses it to implement several variations
      * of the Visitor design pattern.
      */
-    public GameBasic[] each()
+    public Iterable<GameBasic> each()
     { 
         return mJustMe;
     }
-    private final GameBasic[] mJustMe = new GameBasic[] { this };
 }
 

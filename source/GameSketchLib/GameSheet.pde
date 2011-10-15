@@ -27,6 +27,7 @@ class GameSheet
     
     PImage[] getFrames(int[] wantedFrames)
     {
+      
         PImage[] res = new PImage[wantedFrames.length];
         for (int i = 0; i < wantedFrames.length; ++i)
         {
