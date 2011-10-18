@@ -34,8 +34,9 @@ abstract class GameContainer extends GameBasic
     // !! Here, using "abstract" in front of a method forces every subclass
     //    to override the method. If you subclass GameContainer and don't
     //    override these, the compiler will give you an error.
-    abstract public ArrayList<GameBasic> each();
-    abstract protected ArrayList<Object> keys();
+    abstract public void clear();
+    abstract public Iterable<GameBasic> each();
+    abstract protected Iterable<Object> keys();
     abstract protected void putItem(Object k, GameBasic gab);
     abstract protected GameBasic getItem(Object k);
     abstract protected GameContainer emptyCopy();

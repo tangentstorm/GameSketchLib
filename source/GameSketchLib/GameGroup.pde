@@ -1,27 +1,69 @@
-class GameGroup extends GameBasic
+/*
+ * A generic list-like container for GameBasic objects.
+ */
+class GameGroup extends GameContainer
 {
-    ArrayList members = new ArrayList();
+    ArrayList<GameBasic> members = new ArrayList();
 
     GameGroup()
     {
         super();
     }
     
+    // realize abstract GameContainer:
+    
+    @Override
+    GameBasic getItem(Object o)
+    {
+        return this.get((Integer) o);
+    }
+
+    @Override    
+    void putItem(Object o, GameBasic gab)
+    {
+        this.put((Integer) o, gab);
+    }
+    
+    @Override
+    Iterable<GameBasic> each()
+    {
+        return this.members;
+    }
+    
+    @Override
+    Iterable<Object> keys()
+    {
+        ArrayList res = new ArrayList();
+        for (int i = 0; i < this.size(); ++i)
+        {
+            res.add(i);
+        }
+        return res;
+    }
+    
+    @Override
+    GameContainer emptyCopy()
+    {
+        GameGroup res = new GameGroup();
+        for (int i = 0; i < this.size(); ++i)
+        {
+            res.add(GameNull);
+        }
+        return res;
+    }
+    
+    
+    // friendlier ArrayList - like interface:
+    
     GameBasic get(int i)
     {
         return (GameBasic) this.members.get(i);
     }
     
-    GameBasic put(int i, GameBasic obj)
+    GameBasic put(int i, GameBasic gab)
     {
-        this.members.set(i, obj);
-        return obj;
-    }
-
-    // for javaphiles:
-    GameBasic set(int i, GameBasic obj)
-    {
-        return this.put(i, obj);
+        this.members.set(i, gab);
+        return gab;
     }
     
     int size()
@@ -29,15 +71,26 @@ class GameGroup extends GameBasic
         return this.members.size();
     }
 
-    GameBasic add(GameBasic obj)
+    GameBasic add(GameBasic gab)
     {
-        this.members.add(obj);
-        return obj;
+        this.members.add(gab);
+        return gab;
     }
     
-    void remove(GameBasic obj)
+    void remove(GameBasic gab)
     {
-        this.members.remove(obj);
+        this.members.remove(gab);
+    }
+    
+    boolean contains(GameBasic gab)
+    {
+        return this.members.contains(gab);
+    }
+    
+    @Override
+    void clear()
+    {
+        this.members.clear();
     }
     
     
@@ -54,23 +107,23 @@ class GameGroup extends GameBasic
     
     void update()
     {
-        GameBasic obj;
+        GameBasic gab;
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            obj = this.get(i);
-            if (obj.exists && obj.active) obj.update();
+            gab = this.get(i);
+            if (gab.exists && gab.active) gab.update();
         }
     }
     
     void render()
     {
-        GameBasic obj;
+        GameBasic gab;
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            obj = this.get(i);
-            if (obj.exists && obj.visible) obj.render();
+            gab = this.get(i);
+            if (gab.exists && gab.visible) gab.render();
         }
     }
     
@@ -104,8 +157,8 @@ class GameGroup extends GameBasic
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            GameBasic obj = this.get(i);
-            if (! obj.alive) return obj;
+            GameBasic gab = this.get(i);
+            if (! gab.alive) return gab;
         }
         return null;
     }
@@ -115,8 +168,8 @@ class GameGroup extends GameBasic
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            GameBasic obj = this.get(i);
-            if (obj.alive) return obj;
+            GameBasic gab = this.get(i);
+            if (gab.alive) return gab;
         }
         return null;
     }
@@ -126,8 +179,8 @@ class GameGroup extends GameBasic
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            GameBasic obj = this.get(i);
-            if (! obj.active) return obj;
+            GameBasic gab = this.get(i);
+            if (! gab.active) return gab;
         }
         return null;
     }

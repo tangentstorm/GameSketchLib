@@ -8,21 +8,51 @@ class GameGrid extends GameContainer
     public final int area;
     
     private final GameBasic[] mData;
-    
+    private float cellW;
+    private float cellH;
+
     GameGrid(int cols, int rows)
     {
         this.cols = cols;
         this.rows = rows;
         this.area = cols * rows;
         mData = new GameBasic[this.area];
-        this.clear();
+        this.clear(); // fill with GameNull
+        setCellSize(32, 32);
     }
     
+    public void setCellSize(float cellW, float cellH)
+    {
+        this.cellW = cellW;
+        this.cellH = cellH;
+        this.w = cellW * this.cols;
+        this.h = cellH * this.rows;
+    }
+    
+    /**
+     * Warning: this assumes that the objects are actually
+     * in the grid cells. That is only true if you called layout()
+     * and haven't moved them since.
+     */
+    GameBasic memberAtPoint(float x, float y)
+    {
+        int gx = (int) ((x - this.x) / this.cellW);
+        int gy = (int) ((y - this.y) / this.cellH);
+        
+        if (gx >= this.cols || gy >= this.rows)
+        {
+            return GameNull;
+        }
+        else
+        {
+            return this.get(gx, gy);
+        }
+    }
+
     
     // !! We have to override the abstract methods,
     //    each() and changed() or it won't compile.
     
-    @Override
     public ArrayList<GameBasic> each()
     {
         ArrayList<GameBasic> these = new ArrayList<GameBasic>();
@@ -33,7 +63,6 @@ class GameGrid extends GameContainer
         return these;
     }
     
-    @Override
     public GameGrid changed(GameChanger chg)
     {
         GameGrid res = new GameGrid(this.cols, this.rows);
@@ -44,7 +73,6 @@ class GameGrid extends GameContainer
         return res;
     }
     
-    @Override
     protected ArrayList keys()
     {
         ArrayList res = new ArrayList();
@@ -55,19 +83,16 @@ class GameGrid extends GameContainer
         return res;
     }
     
-    @Override
     protected void putItem(Object k, GameBasic gab)
     {
         mData[(Integer) k] = gab;
     }
     
-    @Override
     protected GameBasic getItem(Object k)
     {
         return mData[(Integer) k];
     }
     
-    @Override
     protected GameContainer emptyCopy()
     {
         return new GameGrid(this.cols, this.rows);
@@ -128,7 +153,7 @@ class GameGrid extends GameContainer
     }
     
     
-    public void layout(final float x, final float y, final float cellW, final float cellH)
+    public void layout()
     {
         this.visitCells(new GameGridVisitor()
         { 
@@ -144,14 +169,17 @@ class GameGrid extends GameContainer
     }
     
     public void fitToScreen()
-    {
-        this.layout(0, 0, width/this.cols, height/this.rows);
+    {  
+        this.x = 0;
+        this.y = 0;
+        this.setCellSize(width/this.cols, height/this.rows);
+        this.layout();
     }
     
     
-    private int toIndex(int x, int y)
+    private int toIndex(int gx, int gy)
     {
-        return this.cols * y + x;
+        return this.cols * gy + gx;
     }
 }
 

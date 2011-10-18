@@ -9,7 +9,21 @@ class GameClass
     PFont defaultFont;
     GameKeys keys = new GameKeys();
     
-    // global timer
+    
+    /**
+     * The mouse/touchscreen system.
+     */
+    public final GameMouse mouse = new GameMouse();
+    
+    /**
+     * The current GameTool. Defaults to BasicTool;
+     */
+    public GameTool tool = new BasicTool();
+    
+    
+    /**
+     *  time ellapsed since last frame;
+     */
     public  float frameMillis = 0;
     private float mLastMillis = 0;
     
@@ -33,10 +47,25 @@ class GameClass
         Game.bounds = new GameObject(0, 0, width, height);
         switchState(newState);
     }
+
+    /**
+     * This generates a new code for message(). (It just counts up from 0).
+     */    
+    public int newMessageCode()
+    {
+        return mCodeCounter++;
+    }
+    private int mCodeCounter = 0;
     
+    
+    /**
+     * Switches the game to a new GameState. Pretty self-explanitory. :)
+     */
     void switchState(GameState newState)
     {
         Game.state = newState;
+        Game.mouse.subjects.clear();
+        Game.mouse.observers.clear();
         newState.create();
     }
     

@@ -41,10 +41,11 @@ char[] WASD_E  = new char[] { 'D', 'd', 'E', 'e' };
 
 
 // global event handlers:
-void mousePressed()  { Game.state.mousePressed();  }
-void mouseReleased() { Game.state.mouseReleased(); }
-void mouseMoved()    { Game.state.mouseMoved();    }
-void mouseDragged()  { Game.state.mouseDragged();  }
+// global event handlers:
+void mousePressed()  { Game.mouse.pressed();  }
+void mouseReleased() { Game.mouse.released(); }
+void mouseMoved()    { Game.mouse.moved();    }
+void mouseDragged()  { Game.mouse.dragged();  }
 void keyPressed()    { Game.keys.setKeyDown(true); }
 void keyReleased()   { Game.keys.setKeyDown(null); }
 

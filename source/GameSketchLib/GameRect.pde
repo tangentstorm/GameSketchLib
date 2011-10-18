@@ -4,10 +4,10 @@
  */
 class GameRect extends GameObject
 {
-    color liveColor = #FFFFFF;
-    color deadColor = #CCCCCC;
-    color lineColor = #666666;
-    int lineWeight = 1;
+    public color liveColor = #FFFFFF;
+    public color deadColor = #CCCCCC;
+    public color lineColor = #666666;
+    public int lineWeight = 1;
   
     GameRect()
     {

@@ -1,5 +1,5 @@
 /* -----------------------------------------------------------------
- * GameSketchLib                                 compiled 2011-10-15
+ * GameSketchLib                                 compiled 2011-10-18
  * -----------------------------------------------------------------
  * 
  * GameSketchLib is an open-source game library for Processing.
@@ -67,10 +67,11 @@ char[] WASD_E  = new char[] { 'D', 'd', 'E', 'e' };
 
 
 // global event handlers:
-void mousePressed()  { Game.state.mousePressed();  }
-void mouseReleased() { Game.state.mouseReleased(); }
-void mouseMoved()    { Game.state.mouseMoved();    }
-void mouseDragged()  { Game.state.mouseDragged();  }
+// global event handlers:
+void mousePressed()  { Game.mouse.pressed();  }
+void mouseReleased() { Game.mouse.released(); }
+void mouseMoved()    { Game.mouse.moved();    }
+void mouseDragged()  { Game.mouse.dragged();  }
 void keyPressed()    { Game.keys.setKeyDown(true); }
 void keyReleased()   { Game.keys.setKeyDown(null); }
 
@@ -89,7 +90,21 @@ class GameClass
     PFont defaultFont;
     GameKeys keys = new GameKeys();
     
-    // global timer
+    
+    /**
+     * The mouse/touchscreen system.
+     */
+    public final GameMouse mouse = new GameMouse();
+    
+    /**
+     * The current GameTool. Defaults to BasicTool;
+     */
+    public GameTool tool = new BasicTool();
+    
+    
+    /**
+     *  time ellapsed since last frame;
+     */
     public  float frameMillis = 0;
     private float mLastMillis = 0;
     
@@ -113,10 +128,25 @@ class GameClass
         Game.bounds = new GameObject(0, 0, width, height);
         switchState(newState);
     }
+
+    /**
+     * This generates a new code for message(). (It just counts up from 0).
+     */    
+    public int newMessageCode()
+    {
+        return mCodeCounter++;
+    }
+    private int mCodeCounter = 0;
     
+    
+    /**
+     * Switches the game to a new GameState. Pretty self-explanitory. :)
+     */
     void switchState(GameState newState)
     {
         Game.state = newState;
+        Game.mouse.subjects.clear();
+        Game.mouse.observers.clear();
         newState.create();
     }
     
@@ -205,38 +235,118 @@ final String RUNTIME =
 
 // [ GameBasic.pde ]:
 
+abstract class GameProto
+{
+    /* A generic (untyped) message-passing protocol for
+     * communicating between objects.
+     *
+     * Message codes are unique ints and should be created
+     * with Game.newMessageCode();
+     */
+    void message(GameProto sender, int code, Object arg)
+    {
+    }
+}
+
+
 /*
  * Base class for pretty much anything inside a game.
  *
  */
-class GameBasic
+class GameBasic extends GameProto
 {
+    // !! Nullable protocol
+    public final boolean isNull = false;
+  
+    // !! Playable protocol
     // these are straight out of flixel
     public boolean visible = true; // if false: GameGroup won't ask it to render()
     public boolean active = true;  // if false: GameGroup won't ask it to update()
     public boolean exists = true;  // if false: GameGroup won't ask for either.
     public boolean alive = true;   // this one is just handy in games
     
-    // !! these are handy for storing any of our objects in a grid:
+    void update()
+    {
+    }
+    
+    void render()
+    {
+    }
+
+
+    // !! GridMember protocol
+    // these are handy for storing any of our objects in a grid:
     public int gx;
     public int gy;
+    
 
-    // !! this is each() for all the "single object" subclasses under GameObject
-    private ArrayList<GameBasic> mJustMe = new ArrayList<GameBasic>(1);
-    GameBasic()
+    // !! Spatial protocol
+    // basic bounds checking
+    public float x;
+    public float y;
+    public float w;
+    public float h;
+    
+    public float x2()
     {
-        mJustMe.add(this);
+        return this.x + this.w;
     }
-     
-    // these two are the core interface for all our objects:
-    void update() { }
-    void render() { }
+    
+    public float y2()
+    {
+        return this.y + this.h;
+    }
+    
+    public boolean containsPoint(float x, float y)
+    {
+        return this.x <= x && x <= this.x2()
+            && this.y <= y && y <= this.y2();
+    }
+    
+    // http://stackoverflow.com/questions/306316/determine-if-two-Squares-overlap-each-other
+    public boolean overlaps(GameBasic that)
+    {
+        return (this.x < that.x2() && this.x2() > that.x &&
+                this.y < that.y2() && this.y2() > that.y);
+    }
+
+    /**
+     * Returns true if this overlaps all of that's points.
+     * 
+     * I would have called this contains(), but that is used
+     * by the GameContainer protocol to mean something else.
+     */
+    public boolean covers(GameBasic that)
+    {
+        return this.x <= that.x
+            && this.y <= that.y
+            && this.x2() >= that.x2()
+            && this.y2() >= that.y2();
+    }
 
     
+    // !! Interactive protocol (mouse/touch support)
+    // Register with Game.mouse.subjects to get click/press/drag
+    public void click() {  }
+    public void press() {  }
+    public void  drag()
+    { 
+        this.x = Game.mouse.adjustedX;
+        this.y = Game.mouse.adjustedY;
+    }
+    
+    // Register with Game.mouse.observers to get mouseAt updates.
+    public void mouseAt(float x, float y)
+    {
+    }
+
+    
+    // !! Iteration protocol
+    private ArrayList<GameBasic> mJustMe = new ArrayList<GameBasic>(1);
     /**
      * each() is a special method we provide so that we have
      * a single unified interface for dealing with groups, 
-     * and grids, and single objects in our game.
+     * grids, and single objects in our game.
      *
      * GameContainer uses it to implement several variations
      * of the Visitor design pattern.
@@ -244,6 +354,12 @@ class GameBasic
     public Iterable<GameBasic> each()
     { 
         return mJustMe;
+    }
+    
+    // Constructor
+    GameBasic()
+    {
+        mJustMe.add(this);
     }
 }
 
@@ -286,8 +402,9 @@ abstract class GameContainer extends GameBasic
     // !! Here, using "abstract" in front of a method forces every subclass
     //    to override the method. If you subclass GameContainer and don't
     //    override these, the compiler will give you an error.
-    abstract public ArrayList<GameBasic> each();
-    abstract protected ArrayList<Object> keys();
+    abstract public void clear();
+    abstract public Iterable<GameBasic> each();
+    abstract protected Iterable<Object> keys();
     abstract protected void putItem(Object k, GameBasic gab);
     abstract protected GameBasic getItem(Object k);
     abstract protected GameContainer emptyCopy();
@@ -428,30 +545,67 @@ abstract class GameContainer extends GameBasic
 
 // [ GameGroup.pde ]:
 
-class GameGroup extends GameBasic
+/*
+ * A generic list-like container for GameBasic objects.
+ */
+class GameGroup extends GameContainer
 {
-    ArrayList members = new ArrayList();
+    ArrayList<GameBasic> members = new ArrayList();
 
     GameGroup()
     {
         super();
     }
     
+    // realize abstract GameContainer:
+    
+    GameBasic getItem(Object o)
+    {
+        return this.get((Integer) o);
+    }
+
+    void putItem(Object o, GameBasic gab)
+    {
+        this.put((Integer) o, gab);
+    }
+    
+    Iterable<GameBasic> each()
+    {
+        return this.members;
+    }
+    
+    Iterable<Object> keys()
+    {
+        ArrayList res = new ArrayList();
+        for (int i = 0; i < this.size(); ++i)
+        {
+            res.add(i);
+        }
+        return res;
+    }
+    
+    GameContainer emptyCopy()
+    {
+        GameGroup res = new GameGroup();
+        for (int i = 0; i < this.size(); ++i)
+        {
+            res.add(GameNull);
+        }
+        return res;
+    }
+    
+    
+    // friendlier ArrayList - like interface:
+    
     GameBasic get(int i)
     {
         return (GameBasic) this.members.get(i);
     }
     
-    GameBasic put(int i, GameBasic obj)
+    GameBasic put(int i, GameBasic gab)
     {
-        this.members.set(i, obj);
-        return obj;
-    }
-
-    // for javaphiles:
-    GameBasic set(int i, GameBasic obj)
-    {
-        return this.put(i, obj);
+        this.members.set(i, gab);
+        return gab;
     }
     
     int size()
@@ -459,15 +613,25 @@ class GameGroup extends GameBasic
         return this.members.size();
     }
 
-    GameBasic add(GameBasic obj)
+    GameBasic add(GameBasic gab)
     {
-        this.members.add(obj);
-        return obj;
+        this.members.add(gab);
+        return gab;
     }
     
-    void remove(GameBasic obj)
+    void remove(GameBasic gab)
     {
-        this.members.remove(obj);
+        this.members.remove(gab);
+    }
+    
+    boolean contains(GameBasic gab)
+    {
+        return this.members.contains(gab);
+    }
+    
+    void clear()
+    {
+        this.members.clear();
     }
     
     
@@ -484,23 +648,23 @@ class GameGroup extends GameBasic
     
     void update()
     {
-        GameBasic obj;
+        GameBasic gab;
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            obj = this.get(i);
-            if (obj.exists && obj.active) obj.update();
+            gab = this.get(i);
+            if (gab.exists && gab.active) gab.update();
         }
     }
     
     void render()
     {
-        GameBasic obj;
+        GameBasic gab;
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            obj = this.get(i);
-            if (obj.exists && obj.visible) obj.render();
+            gab = this.get(i);
+            if (gab.exists && gab.visible) gab.render();
         }
     }
     
@@ -534,8 +698,8 @@ class GameGroup extends GameBasic
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            GameBasic obj = this.get(i);
-            if (! obj.alive) return obj;
+            GameBasic gab = this.get(i);
+            if (! gab.alive) return gab;
         }
         return null;
     }
@@ -545,8 +709,8 @@ class GameGroup extends GameBasic
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            GameBasic obj = this.get(i);
-            if (obj.alive) return obj;
+            GameBasic gab = this.get(i);
+            if (gab.alive) return gab;
         }
         return null;
     }
@@ -556,8 +720,8 @@ class GameGroup extends GameBasic
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
         {
-            GameBasic obj = this.get(i);
-            if (! obj.active) return obj;
+            GameBasic gab = this.get(i);
+            if (! gab.active) return gab;
         }
         return null;
     }
@@ -587,16 +751,47 @@ class GameGrid extends GameContainer
     public final int area;
     
     private final GameBasic[] mData;
-    
+    private float cellW;
+    private float cellH;
+
     GameGrid(int cols, int rows)
     {
         this.cols = cols;
         this.rows = rows;
         this.area = cols * rows;
         mData = new GameBasic[this.area];
-        this.clear();
+        this.clear(); // fill with GameNull
+        setCellSize(32, 32);
     }
     
+    public void setCellSize(float cellW, float cellH)
+    {
+        this.cellW = cellW;
+        this.cellH = cellH;
+        this.w = cellW * this.cols;
+        this.h = cellH * this.rows;
+    }
+    
+    /**
+     * Warning: this assumes that the objects are actually
+     * in the grid cells. That is only true if you called layout()
+     * and haven't moved them since.
+     */
+    GameBasic memberAtPoint(float x, float y)
+    {
+        int gx = (int) ((x - this.x) / this.cellW);
+        int gy = (int) ((y - this.y) / this.cellH);
+        
+        if (gx >= this.cols || gy >= this.rows)
+        {
+            return GameNull;
+        }
+        else
+        {
+            return this.get(gx, gy);
+        }
+    }
+
     
     // !! We have to override the abstract methods,
     //    each() and changed() or it won't compile.
@@ -701,7 +896,7 @@ class GameGrid extends GameContainer
     }
     
     
-    public void layout(final float x, final float y, final float cellW, final float cellH)
+    public void layout()
     {
         this.visitCells(new GameGridVisitor()
         { 
@@ -717,14 +912,17 @@ class GameGrid extends GameContainer
     }
     
     public void fitToScreen()
-    {
-        this.layout(0, 0, width/this.cols, height/this.rows);
+    {  
+        this.x = 0;
+        this.y = 0;
+        this.setCellSize(width/this.cols, height/this.rows);
+        this.layout();
     }
     
     
-    private int toIndex(int x, int y)
+    private int toIndex(int gx, int gy)
     {
-        return this.cols * y + x;
+        return this.cols * gy + gx;
     }
 }
 
@@ -798,26 +996,240 @@ class GameMathClass
     }
 }
 
+// [ GameMouse.pde ]:
+
+/**
+ * Global Mouse handler.
+ */
+class GameMouse
+{
+    /** 
+     * stores current mouseX
+     */
+    public float x;
+    
+    /** 
+     * stores current mouseX
+     */
+    public float y;
+    
+    /** 
+     * mouseX recorded on mousePressed
+     */
+    public float startX;
+    
+    /** 
+     * mouseY recorded on mousePressed
+     */
+    public float startY;
+    
+    /** 
+     * offset of subject.x from mouseX
+     */
+    public float offsetX;
+    
+    /** 
+     * offset of subject.y from mouseY
+     */
+    public float offsetY;
+    
+    /** 
+     * mouseX adjusted by offsetX
+     */
+    public float adjustedX;
+    
+    /** 
+     * mouseY adjusted by offsetY
+     */
+    public float adjustedY;
+    
+    /** 
+     * are we currently dragging/swiping?
+     * true if mouse is down, even if subject is GameNull
+     */
+    public boolean dragging = false;
+    
+    /**
+     * The GameBasic we're currently dragging, or GameNull.
+     */
+    public GameBasic subject = GameNull;
+    
+    /**
+     * Adding any GameBasic to Game.mouse.subjects lets it 
+     * interact with the mouse / touchscreen.
+     *
+     * If Game.tool is set to BasicTool (the default) then
+     * the subject's click(), drag() and press() will be
+     * called.
+     *
+     * Other behaviors are defined by the individual Tools.
+     */
+    public GameGroup subjects  = new GameGroup();
+    
+    /**
+     * Adding a GameBasic to Game.mouse.observers lets it
+     * receive position updates.
+     *
+     * This might come in handy for targeting systems,
+     * mouseover effects, etc.
+     */
+    public GameGroup observers = new GameGroup();
+  
+    // mousePressed
+    public void pressed()
+    {
+        this.x = this.startX = mouseX;
+        this.y = this.startY = mouseY;
+        
+        for (GameBasic gab : this.subjects.each())
+        {
+            if (gab.containsPoint(this.x, this.y))
+            {
+                this.subject = gab;
+                this.offsetX = gab.x - this.x;
+                this.offsetY = gab.y - this.y;
+                return;
+            }
+        }
+        // whatever they clicked on wasn't clickable :)
+        this.subject = GameNull;
+    }
+    
+    // mouseReleased
+    public void released()
+    {
+        this.updateCoordinates();
+        
+        if (this.dragging)
+        {
+            Game.tool.dragEnd(this.x, this.y, this.subject);
+        }
+        else
+        {
+            // TODO add a timer and allow for long presses
+            Game.tool.click(this.x, this.y, this.subject);
+        }
+      
+        this.dragging = false;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.subject = GameNull;
+    }
+    
+    // mouseMoved
+    public void moved()
+    {
+        this.updateCoordinates();
+        this.notifyObservers();
+    }
+    
+    // mouseDragged
+    public void dragged()
+    {
+        this.moved();
+        if (! this.dragging)
+        {
+            Game.tool.dragStart(this.startX, this.startY, this.subject);
+            this.dragging = true;
+        }
+        this.updateCoordinates();
+        Game.tool.drag(this.x, this.y, this.subject);
+    }
+    
+    protected void updateCoordinates()
+    {
+        this.x = mouseX;
+        this.y = mouseY;
+        this.adjustedX = this.x + this.offsetX;
+        this.adjustedY = this.y + this.adjustedY;
+    }
+    
+    protected void notifyObservers()
+    {
+         for (GameBasic gab : this.observers.each())
+         {
+             // gab.mouseAt(mouseX, mouseY);
+         }
+    }
+}
+
+
 // [ GameNull.pde ]:
 
-class _GameNull extends GameBasic
+/**
+ * This is a special single-instance class that gives
+ * us a null-like value that represents the lack of a
+ * normal GameBasic instance.
+ *
+ * If we used the regular null value, we'd have to 
+ * check for (gab != null) everywhere, but with
+ * GameNull, we can treat it like any other GameBasic
+ * and it just transparently does the right thing.
+ *
+ * If you do need to test for it, the boolean .isNull
+ * is defined on all GameBasic classes. It's false for
+ * everything but this class.
+ * 
+ * http://en.wikipedia.org/wiki/Null_Object_pattern
+ */
+final class _GameNull extends GameBasic
 {
+    // Nullable
+    public final boolean isNull = true;
+  
+    // Playable
+    // all booleans are false, so no render/update
     public final boolean alive = false;
     public final boolean exists = false;
     public final boolean visible = false;
     public final boolean active = false;
-    _GameNull()
+
+    // GridMember
+    public final int gx = 0;
+    public final int gy = 0;
+    
+    // Spatial
+    // Not A Number coordinates, all overlapping returns false
+    public final float x = Float.NaN;
+    public final float y = Float.NaN;
+    public final float w = Float.NaN;
+    public final float h = Float.NaN;
+    
+    boolean containsPoint(float px, float py)
     {
+        return false;
     }
     
-    private final  ArrayList<GameBasic> mEmptyList = new ArrayList<GameBasic>(0);
+    boolean overlaps(GameBasic other)
+    {
+        return false;
+    }
     
+    boolean contains(GameBasic other)
+    {
+        return false;
+    }
+    
+    
+    // Iterable
+    // yields an empty list
+    private final  ArrayList<GameBasic> mEmptyList = new ArrayList<GameBasic>(0);
     ArrayList<GameBasic> each()
     {
         return mEmptyList;
     }
+
+    // Constructor
+    private int mInstanceCount = 0;
+    _GameNull()
+    {
+        if (++mInstanceCount > 1)
+        {
+            throw new RuntimeException("GameNull is a singleton. There can be only one.");
+        }
+    }
 }
-_GameNull GameNull = new _GameNull();
+final _GameNull GameNull = new _GameNull();
 
 
 // [ GameLink.pde ]:
@@ -981,10 +1393,10 @@ class GameObject extends GameBasic
  */
 class GameRect extends GameObject
 {
-    color liveColor = #FFFFFF;
-    color deadColor = #CCCCCC;
-    color lineColor = #666666;
-    int lineWeight = 1;
+    public color liveColor = #FFFFFF;
+    public color deadColor = #CCCCCC;
+    public color lineColor = #666666;
+    public int lineWeight = 1;
   
     GameRect()
     {
@@ -1036,6 +1448,7 @@ class GameSheet
     
     PImage[] getFrames(int[] wantedFrames)
     {
+      
         PImage[] res = new PImage[wantedFrames.length];
         for (int i = 0; i < wantedFrames.length; ++i)
         {
@@ -1075,18 +1488,10 @@ class GameSprite extends GameObject
     int degrees = 0;    
     float xOffset = 0;
     float yOffset = 0;
-    
-    GameSprite(float x, float y, PImage[] frames)
+    GameSprite(float x, float y)
     {
         super(x, y, 0, 0);
-        setFrames(frames);
         animated = true;
-    }
-
-    GameSprite(float x, float y, PImage still)
-    {
-        super(x, y, 0, 0);
-        setFrames(new PImage[] { still });
     }
     
     void setFrames(PImage[] frames)
@@ -1094,6 +1499,12 @@ class GameSprite extends GameObject
         mFrames = frames;
         sizeToFrame();
     }
+    
+    void sheetFrames(int[] frameNums)
+    {
+        this.setFrames(SHEET.getFrames(frameNums));
+    }
+    
     
     void sizeToFrame()
     {
@@ -1147,6 +1558,7 @@ class GameSprite extends GameObject
         }
     }
 }
+
 
 // [ GameSquare.pde ]:
 
@@ -1330,6 +1742,75 @@ class GameTimer extends GameObject
     {
     }
 }
+
+// [ GameTool.pde ]:
+
+/**
+ * GameTools allow the GameMouse to interact with the
+ * game in different ways.
+ *
+ * They work very much like tools in any drawing or paint
+ * program, but may also come in handy for things like:
+ *
+ *   - weapons with mouse based aiming
+ *   - level editors
+ *   - games where you assign tasks to characters
+ *   - etc.
+ */
+abstract class GameTool extends GameProto
+{
+    void click(float x, float y, GameBasic subject)
+    {
+    }
+
+    void press(float x, float y, GameBasic subject)
+    {
+    }
+
+    void dragStart(float x, float y, GameBasic subject)
+    {
+    }
+    
+    void drag(float x, float y, GameBasic subject)
+    {
+    }
+
+    void dragEnd(float x, float y, GameBasic subject)
+    {
+    }
+    
+    
+    /* Same as GameBasic.send
+     *
+     * A generic (untyped) message-passing protocol for
+     * communicating between objects.
+     *
+     * Messages should be defined with Game.newMessageId();
+     */
+    Object send(int message, Object arg)
+    {
+        return null;
+    }
+}
+
+/**
+ * The BasicTool simply calls .click, .drag, or (TODO) .press
+ * on anything in Game.mouse.subjects that the user interacts with.
+ */
+class BasicTool extends GameTool
+{
+    void click(float x, float y, GameBasic subject)
+    {
+        subject.click();
+    }
+
+    void drag(float x, float y, GameBasic subject)
+    {
+        subject.drag();
+    }
+}
+
+
 
 /* -- [End GameSketchLib] --------------------------------------*/
 

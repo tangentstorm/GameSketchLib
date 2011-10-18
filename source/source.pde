@@ -46,6 +46,7 @@ final String chunks[] =
   "GameGrid.pde"   ,
   "GameKeys.pde"   ,
   "GameMath.pde"   ,
+  "GameMouse.pde"  ,
   "GameNull.pde"   ,
   "GameLink.pde"   ,
   "GameObject.pde" ,
@@ -56,6 +57,7 @@ final String chunks[] =
   "GameState.pde"  ,
   "GameText.pde"   ,
   "GameTimer.pde"  ,
+  "GameTool.pde"   ,
   kSpliceLibEnd    
 };
 
@@ -143,6 +145,8 @@ for (int i = 0; i < chunks.length; ++i)
         
         // dump file contents:
         String lines[] = loadStrings(kDirName + "/" + s);
+        if (lines.length == 0) throw new RuntimeException(s + " was empty!");
+        
         for (int j = 0; j < lines.length; ++j)
         {
             if (lines[j].indexOf(kReplaceMarker) != -1)
