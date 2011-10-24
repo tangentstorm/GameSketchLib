@@ -1,15 +1,17 @@
 class MenuState extends GameState
 {
-   void create()
+   public void create()
    {
        add(new GameText("A New GameSketchLib Game!",
-                        Game.bounds.w /2, 100, #FFFFFF, 18));
+                        this.w /2, 100, #FFFFFF, 18));
                         
        add(new GameText("Click to Play",
-                        Game.bounds.w / 2, 150, #CCCCCC, 12));
+                        this.w / 2, 150, #CCCCCC, 12));
+                        
+       Game.mouse.subjects.add(this);
    }
    
-   void mousePressed()
+   public void click()
    {
        Game.switchState(new PlayState());
    }

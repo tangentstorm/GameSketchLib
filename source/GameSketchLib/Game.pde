@@ -39,13 +39,13 @@ class GameClass
         }
     }
     
-    void init(GameState newState)
+    // !! no state in init, so that we can be sure .bounds is ready for GameState constructor
+    public void init()
     {
         Game.defaultFont = 
             CONFIG_JVM ? loadFont("DejaVuSans-48.vlw")
                        : loadFont("Arial");
         Game.bounds = new GameObject(0, 0, width, height);
-        switchState(newState);
     }
 
     /**

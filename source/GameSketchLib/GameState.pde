@@ -2,6 +2,13 @@ class GameState extends GameGroup
 {
     color bgColor = #000000;
     
+    public GameState()
+    {
+        super();
+        this.w = Game.bounds.w;
+        this.h = Game.bounds.h;
+    }
+    
     void create()
     {
     }

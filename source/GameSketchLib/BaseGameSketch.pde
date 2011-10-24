@@ -21,6 +21,7 @@
 void setup()
 {
     Game.size(300, 300);
-    Game.init(new MenuState());
+    Game.init();
+    Game.switchState(new MenuState());
 }
 
