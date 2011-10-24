@@ -111,7 +111,7 @@ public class Build
         out.println(" * It was created by Michal J Wallace and loosely modeled after");
         out.println(" * the flixel game library for actionscript.");
         out.println(" * ");
-        out.println(" *       website: http://org.gamesketchlib.org/");
+        out.println(" *       website: http://GameSketchLib.org/");
         out.println(" *          code: https://github.com/sabren/GameSketchLib");
         out.println(" *       twitter: @tangentstorm");
         out.println(" * ");

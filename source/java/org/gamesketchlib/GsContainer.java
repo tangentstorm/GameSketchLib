@@ -129,15 +129,15 @@ abstract public class GsContainer extends GsBasic
 
     /**
      * This one is almost the same as .eachChanged, but returns an ArrayList<Object>
-     * instead of an ArrayList<GsBasic>. GsExtractor.extract() can
+     * instead of an ArrayList<GsBasic>. GsReporter.report() can
      * return any Object whatsoever.
      */
-     public GsList extract(GsExtractor ext)
+     public GsList extract(GsReporter ext)
      {
         GsList res = new GsList();
         for (GsBasic gab : this.each())
         {
-            res.add(ext.extract(gab));
+            res.add(ext.report(gab));
         }
         return res;
      }

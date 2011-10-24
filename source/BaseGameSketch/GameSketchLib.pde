@@ -7,7 +7,7 @@
  * It was created by Michal J Wallace and loosely modeled after
  * the flixel game library for actionscript.
  * 
- *       website: http://org.gamesketchlib.org/
+ *       website: http://GameSketchLib.org/
  *          code: https://github.com/sabren/GameSketchLib
  *       twitter: @tangentstorm
  * 
@@ -311,15 +311,15 @@ abstract public class GsContainer extends GsBasic
 
     /**
      * This one is almost the same as .eachChanged, but returns an ArrayList<Object>
-     * instead of an ArrayList<GsBasic>. GsExtractor.extract() can
+     * instead of an ArrayList<GsBasic>. GsReporter.report() can
      * return any Object whatsoever.
      */
-     public GsList extract(GsExtractor ext)
+     public GsList extract(GsReporter ext)
      {
         GsList res = new GsList();
         for (GsBasic gab : this.each())
         {
-            res.add(ext.extract(gab));
+            res.add(ext.report(gab));
         }
         return res;
      }
@@ -480,24 +480,24 @@ public class GsGrid extends GsContainer
     }
     
     
-    public void visitCells(GsGridVisitor vis)
+    public void visitCells(GsVisitorG vis)
     {
         for (int gx = 0; gx < this.cols; ++gx)
         {
             for (int gy = 0; gy < this.rows; ++gy)
             {
-                vis.visitCell(gx, gy, this.get(gx, gy));
+                vis.visit(gx, gy, this.get(gx, gy));
             }
         }
     }
     
-    public void populateCells(GsGridPopulator pop)
+    public void populateCells(GsPopulatorG pop)
     {
         for (int gx = 0; gx < this.cols; ++gx)
         {
             for (int gy = 0; gy < this.rows; ++gy)
             {
-                this.put(gx, gy, pop.populateCell(gx, gy));
+                this.put(gx, gy, pop.populate(gx, gy));
             }
         }
     }
@@ -505,9 +505,9 @@ public class GsGrid extends GsContainer
     
     public void layout()
     {
-        this.visitCells(new GsGridVisitor()
+        this.visitCells(new GsVisitorG()
         { 
-             public void visitCell(int gx, int gy, GsBasic gab)
+             public void visit(int gx, int gy, GsBasic gab)
              {
                   // only GsObject and its children have coordinates
                   if (gab instanceof GsObject)
@@ -1834,6 +1834,15 @@ public interface GsChanger
     public GsBasic change(GsBasic gab);
 }
 
+// [ GsChangerG.java ]:
+
+
+
+public interface GsChangerG
+{
+    public GsBasic change(int gx, int gy, GsBasic old);
+}
+
 // [ GsChecker.java ]:
 
 
@@ -1843,58 +1852,13 @@ public interface GsChecker
     public  boolean check(GsBasic gab);
 }
 
-// [ GsExtractor.java ]:
+// [ GsCheckerG.java ]:
 
 
 
-public interface GsExtractor
+public interface GsCheckerG
 {
-    public  Object extract(GsBasic gab);
-}
-
-// [ GsGridChanger.java ]:
-
-
-
-public interface GsGridChanger
-{
-    public GsBasic changeCell(int gx, int gy, GsBasic old);
-}
-
-// [ GsGridChecker.java ]:
-
-
-
-public interface GsGridChecker
-{
-    public boolean checkCell(int gx, int gy, GsBasic gab);
-}
-
-// [ GsGridExtractor.java ]:
-
-
-
-public interface GsGridExtractor
-{
-    public GsBasic extractCell(int gx, int gy, GsBasic old);
-}
-
-// [ GsGridPopulator.java ]:
-
-
-
-public interface GsGridPopulator
-{
-    public GsBasic populateCell(int gx, int gy);
-}
-
-// [ GsGridVisitor.java ]:
-
-
-
-public interface GsGridVisitor
-{
-    public void visitCell(int gx, int gy, GsBasic gab);
+    public boolean check(int gx, int gy, GsBasic gab);
 }
 
 // [ GsPopulator.java ]:
@@ -1906,13 +1870,49 @@ public interface GsPopulator
     public GsBasic populate(Object k);
 }
 
+// [ GsPopulatorG.java ]:
+
+
+
+public interface GsPopulatorG
+{
+    public GsBasic populate(int gx, int gy);
+}
+
+// [ GsReporter.java ]:
+
+
+
+public interface GsReporter
+{
+    public Object report(GsBasic gab);
+}
+
+// [ GsReporterG.java ]:
+
+
+
+public interface GsReporterG
+{
+    public Object report(int gx, int gy, GsBasic old);
+}
+
 // [ GsVisitor.java ]:
 
 
 
 public interface GsVisitor
 {
-    public  void visit(GsBasic gab);
+    public void visit(GsBasic gab);
+}
+
+// [ GsVisitorG.java ]:
+
+
+
+public interface GsVisitorG
+{
+    public void visit(int gx, int gy, GsBasic gab);
 }
 
 /* -- [End GameSketchLib] --------------------------------------*/

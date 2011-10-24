@@ -2,7 +2,7 @@ package org.gamesketchlib.delegate;
 
 import org.gamesketchlib.GsBasic;
 
-public interface GsVisitor
+public interface GsReporter
 {
-    public void visit(GsBasic gab);
+    public Object report(GsBasic gab);
 }

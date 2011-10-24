@@ -135,24 +135,24 @@ public class GsGrid extends GsContainer
     }
     
     
-    public void visitCells(GsGridVisitor vis)
+    public void visitCells(GsVisitorG vis)
     {
         for (int gx = 0; gx < this.cols; ++gx)
         {
             for (int gy = 0; gy < this.rows; ++gy)
             {
-                vis.visitCell(gx, gy, this.get(gx, gy));
+                vis.visit(gx, gy, this.get(gx, gy));
             }
         }
     }
     
-    public void populateCells(GsGridPopulator pop)
+    public void populateCells(GsPopulatorG pop)
     {
         for (int gx = 0; gx < this.cols; ++gx)
         {
             for (int gy = 0; gy < this.rows; ++gy)
             {
-                this.put(gx, gy, pop.populateCell(gx, gy));
+                this.put(gx, gy, pop.populate(gx, gy));
             }
         }
     }
@@ -160,9 +160,9 @@ public class GsGrid extends GsContainer
     
     public void layout()
     {
-        this.visitCells(new GsGridVisitor()
+        this.visitCells(new GsVisitorG()
         { 
-             public void visitCell(int gx, int gy, GsBasic gab)
+             public void visit(int gx, int gy, GsBasic gab)
              {
                   // only GsObject and its children have coordinates
                   if (gab instanceof GsObject)

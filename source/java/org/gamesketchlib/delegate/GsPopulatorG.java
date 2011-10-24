@@ -2,7 +2,7 @@ package org.gamesketchlib.delegate;
 
 import org.gamesketchlib.GsBasic;
 
-public interface GsExtractor
+public interface GsPopulatorG
 {
-    public  Object extract(GsBasic gab);
+    public GsBasic populate(int gx, int gy);
 }
