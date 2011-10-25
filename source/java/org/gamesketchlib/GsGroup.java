@@ -9,7 +9,7 @@ public class GsGroup extends GsContainer
 {
     GsList<GsBasic> members = new GsList();
 
-    GsGroup()
+    public GsGroup()
     {
         super();
     }
@@ -59,34 +59,34 @@ public class GsGroup extends GsContainer
     
     // friendlier ArrayList - like interface:
     
-    GsBasic get(int i)
+    public GsBasic get(int i)
     {
         return (GsBasic) this.members.get(i);
     }
     
-    GsBasic put(int i, GsBasic gab)
+    public GsBasic put(int i, GsBasic gab)
     {
         this.members.set(i, gab);
         return gab;
     }
     
-    int size()
+    public int size()
     {
         return this.members.size();
     }
 
-    GsBasic add(GsBasic gab)
+    public GsBasic add(GsBasic gab)
     {
         this.members.add(gab);
         return gab;
     }
     
-    void remove(GsBasic gab)
+    public void remove(GsBasic gab)
     {
         this.members.remove(gab);
     }
     
-    boolean contains(GsBasic gab)
+    public boolean contains(GsBasic gab)
     {
         return this.members.contains(gab);
     }
@@ -98,12 +98,12 @@ public class GsGroup extends GsContainer
     }
     
     
-    boolean isEmpty()
+    public boolean isEmpty()
     {
         return this.size() == 0;
     }
     
-    GsBasic atRandom()
+    public GsBasic atRandom()
     {
         if (this.isEmpty()) return null;
         return this.get((int) random(this.size()));
@@ -111,7 +111,7 @@ public class GsGroup extends GsContainer
 
 
     @Override
-    void update()
+    public void update()
     {
         GsBasic gab;
         int len = this.members.size();
@@ -134,7 +134,7 @@ public class GsGroup extends GsContainer
         }
     }
     
-    void overlap(GsGroup other)
+    public void overlap(GsGroup other)
     {
         // !! this will certainly crash if the group contains other groups
         // TODO: see how flixel handles GsObject in .overlap()
@@ -159,7 +159,7 @@ public class GsGroup extends GsContainer
     }
     
     
-    GsBasic firstDead()
+    public GsBasic firstDead()
     {
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
@@ -170,7 +170,7 @@ public class GsGroup extends GsContainer
         return null;
     }
     
-    GsBasic firstAlive()
+    public GsBasic firstAlive()
     {
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
@@ -181,7 +181,7 @@ public class GsGroup extends GsContainer
         return null;
     }
 
-    GsBasic firstInactive()
+    public GsBasic firstInactive()
     {
         int len = this.members.size();
         for (int i = 0; i < len; ++i)
@@ -193,7 +193,7 @@ public class GsGroup extends GsContainer
     }
 
 
-    void removeDead()
+    public void removeDead()
     {
         while (true)
         {
@@ -202,5 +202,14 @@ public class GsGroup extends GsContainer
         }
     }
 
+    public GsBasic[] reversed()
+    {
+        GsBasic res[] = new GsBasic[this.members.size()];
+        for (int i = 0; i < res.length; ++i)
+        {
+            res[i] = this.get(res.length - 1 - i);
+        }
+        return res;
+    }
 }
 

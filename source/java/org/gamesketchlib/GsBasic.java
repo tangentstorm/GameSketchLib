@@ -17,12 +17,11 @@ public class GsBasic extends GsProto
     public boolean active = true;  // if false: GsGroup won't ask it to update()
     public boolean exists = true;  // if false: GsGroup won't ask for either.
     public boolean alive = true;   // this one is just handy in games
-    
-    void update()
+    public void update()
     {
     }
-    
-    void render()
+
+    public void render()
     {
     }
 
@@ -31,69 +30,95 @@ public class GsBasic extends GsProto
     // these are handy for storing any of our objects in a grid:
     public int gx;
     public int gy;
-    
+
 
     // !! Spatial protocol
     // basic bounds checking
-    public float x;
-    public float y;
-    public float w;
-    public float h;
-    
+    public float x = 0;
+    public float y = 0;
+    public float w = 0;
+    public float h = 0;
+
+    /**
+     * @return the second x coordinate (far right side if .w is positive)
+     */
     public float x2()
     {
         return this.x + this.w;
     }
-    
+
+    /**
+     * @return the second y coordinate (bottom if h is positive)
+     */
     public float y2()
     {
         return this.y + this.h;
     }
-    
+
+    /**
+     * @return the horizontal center.
+     */
+    public float cx()
+    {
+        return this.x + this.w / 2;
+    }
+
+    /**
+     * @return the vertical center.
+     */
+    public float cy()
+    {
+        return this.y + this.h / 2;
+    }
+
     public boolean containsPoint(float x, float y)
     {
         return this.x <= x && x <= this.x2()
-            && this.y <= y && y <= this.y2();
+        && this.y <= y && y <= this.y2();
     }
-    
+
     // http://stackoverflow.com/questions/306316/determine-if-two-Squares-overlap-each-other
     public boolean overlaps(GsBasic that)
     {
         return (this.x < that.x2() && this.x2() > that.x &&
-                this.y < that.y2() && this.y2() > that.y);
+        this.y < that.y2() && this.y2() > that.y);
     }
 
     /**
      * Returns true if this overlaps all of that's points.
-     * 
+     *
      * I would have called this contains(), but that is used
      * by the GsContainer protocol to mean something else.
      */
     public boolean covers(GsBasic that)
     {
         return this.x <= that.x
-            && this.y <= that.y
-            && this.x2() >= that.x2()
-            && this.y2() >= that.y2();
+        && this.y <= that.y
+        && this.x2() >= that.x2()
+        && this.y2() >= that.y2();
     }
 
-    
+
     // !! Interactive protocol (mouse/touch support)
     // Register with Game.mouse.subjects to get click/press/drag
     public void click() {  }
     public void press() {  }
+    public boolean draggable = false;
     public void  drag()
-    { 
-        this.x = Game.mouse.adjustedX;
-        this.y = Game.mouse.adjustedY;
+    {
+        if (this.draggable)
+        {
+            this.x = Game.mouse.adjustedX;
+            this.y = Game.mouse.adjustedY;
+        }
     }
-    
+
     // Register with Game.mouse.observers to get mouseAt updates.
     public void mouseAt(float x, float y)
     {
     }
 
-    
+
     // !! Iteration protocol
     private GsList<GsBasic> mJustMe = new GsList<GsBasic>(1);
     /**
@@ -112,7 +137,7 @@ public class GsBasic extends GsProto
     }
     
     // Constructor
-    GsBasic()
+    public GsBasic()
     {
         mJustMe.add(this);
     }

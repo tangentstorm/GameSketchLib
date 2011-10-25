@@ -4,7 +4,7 @@ import static org.gamesketchlib._GameSketchLib.*;
 
 public class GsState extends GsGroup
 {
-    int bgColor = 0x00000000;
+    protected int bgColor = 0x00000000;
     
     public GsState()
     {

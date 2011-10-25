@@ -12,7 +12,7 @@ public abstract class GsProto
      * Message codes are unique ints and should be created
      * with Game.newMessageCode();
      */
-    void message(GsProto sender, int code, Object arg)
+    public void message(GsProto sender, int code, Object arg)
     {
     }
 }

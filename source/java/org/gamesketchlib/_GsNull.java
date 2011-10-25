@@ -60,11 +60,11 @@ public final class _GsNull extends GsBasic
         //    avoid that without resorting to getters and setters. :/
 
         // Spatial
-        // Not A Number coordinates, all overlapping returns false
-        x = Float.NaN;
-        y = Float.NaN;
-        w = Float.NaN;
-        h = Float.NaN;
+        // TODO : GsNull coordinates should all be NaN, but not sure how to make it work for pjs
+//        x = Float.NaN;
+//        y = Float.NaN;
+//        w = Float.NaN;
+//        h = Float.NaN;
 
         // Playable
         alive = false;

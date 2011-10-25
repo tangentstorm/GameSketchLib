@@ -18,7 +18,7 @@ public class GsRect extends GsObject
         super(0, 0, 0, 0);
     }
 
-    GsRect(float x, float y, float w, float h)
+    public GsRect(float x, float y, float w, float h)
     {
         super(x, y, w, h);
     }

@@ -21,7 +21,7 @@ public class GsText extends GsObject
      */
     public GsRect bounds;
     
-    GsText(String label, float x, float y, int textColor, int fontSize)
+    public GsText(String label, float x, float y, int textColor, int fontSize)
     {
         super(x, y, 0, 0);
         
@@ -61,6 +61,15 @@ public class GsText extends GsObject
             this.bounds.x -= this.w / 2;
         if (this.vAlign == BASELINE)
             this.bounds.y -= textAscent();
+    }
+
+    public void moveByBoundsTo(float x, float y)
+    {
+        float offX = this.x - bounds.x;
+        float offY = this.y - bounds.y;
+        this.x = x + offX;
+        this.y = y + offY;
+        calcBounds();
     }
 
     protected void setupFont()

@@ -8,13 +8,13 @@ import static org.gamesketchlib._GameSketchLib.*;
 public class GsBasicTool extends GsTool
 {
     @Override
-    void click(float x, float y, GsBasic subject)
+    public void click(float x, float y, GsBasic subject)
     {
         if (subject.isNull()) Game.state.click(); else subject.click();
     }
 
     @Override
-    void drag(float x, float y, GsBasic subject)
+    public void drag(float x, float y, GsBasic subject)
     {
         if (subject.isNull()) Game.state.drag(); else subject.drag();
     }

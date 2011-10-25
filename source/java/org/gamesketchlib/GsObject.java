@@ -6,21 +6,17 @@ package org.gamesketchlib;
 */
 public class GsObject extends GsBasic
 {
-    public float x = 0;
-    public float y = 0;
-    public float w = 0;
-    public float h = 0;
 
     float dx = 0;
     float dy = 0;
     float health = 1;
     
-    GsObject()
+    public GsObject()
     {
         reset(0,0,0,0);
     }
     
-    GsObject(float x, float y, float w, float h)
+    public GsObject(float x, float y, float w, float h)
     {
         reset(x, y, w, h);
     }
@@ -89,6 +85,11 @@ public class GsObject extends GsBasic
     
     public void onOverlap(GsObject other)
     {
+    }
+
+    public boolean equals(GsObject other)
+    {
+        return this == other;
     }
     
 }

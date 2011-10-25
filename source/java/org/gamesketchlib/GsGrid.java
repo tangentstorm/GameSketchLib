@@ -19,7 +19,7 @@ public class GsGrid extends GsContainer
     private float cellW;
     private float cellH;
 
-    GsGrid(int cols, int rows)
+    public GsGrid(int cols, int rows)
     {
         this.cols = cols;
         this.rows = rows;
@@ -42,7 +42,7 @@ public class GsGrid extends GsContainer
      * in the grid cells. That is only true if you called layout()
      * and haven't moved them since.
      */
-    GsBasic memberAtPoint(float x, float y)
+    public GsBasic memberAtPoint(float x, float y)
     {
         int gx = (int) ((x - this.x) / this.cellW);
         int gy = (int) ((y - this.y) / this.cellH);

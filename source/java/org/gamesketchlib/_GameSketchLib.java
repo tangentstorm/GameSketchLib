@@ -37,10 +37,10 @@ public class _GameSketchLib
     }
 
     // global event handlers:
-    void mousePressed()  { Game.mouse.pressed(mouseX, mouseY);  }
-    void mouseReleased() { Game.mouse.released(mouseX, mouseY); }
     void mouseMoved()    { Game.mouse.moved(mouseX, mouseY);    }
-    void mouseDragged()  { Game.mouse.dragged(mouseX, mouseY);  }
+    void mousePressed()  { Game.mouse.pressed(mouseX, mouseY, mouseButton);  }
+    void mouseReleased() { Game.mouse.released(mouseX, mouseY, mouseButton); }
+    void mouseDragged()  { Game.mouse.dragged(mouseX, mouseY, mouseButton);  }
     void keyPressed()    { Game.keys.setKeyDown(true, key==CODED, key, keyCode); }
     void keyReleased()   { Game.keys.setKeyDown(null, key == CODED, key, keyCode); }
 
@@ -85,64 +85,74 @@ public class _GameSketchLib
         GsList() { super(); }
         GsList(int i) { super(i); }
     }
-    public static class GsDict extends HashMap{ }
+    public static class GsDict<K,V> extends HashMap<K,V>
+    {
+    }
+
     // TODO : public static class GsFont  {}
     // TODO : public static class GsImage {}
 
+
+    public static final int TOOL_ARROW_TO_NOTHING = Game.newMessageCode();
+    public static final int TOOL_ARROW_TO_SUBJECT = Game.newMessageCode();
 
 
 
 // [suppress]
     
     // processing API. marked as "native" here so we can compile without Processing
-    public static final int ARGB = 0;
-    public static final double PI = 3.14159265;
-    native static void size(float w, float h);
-    native static void print(String s);
-    native static void println(String s);
-    native static float millis();
-    native static float random(float x);
-    native static void background(int color);
-    native static void stroke(int textColor);
-    native static void link(String url, String aNew);
-    native static void line(float v, float lineY, float v1, float lineY1);
-    native static void noFill();
-    native static void rect(float x, float y, float w, float h);
-    native static void strokeWeight(int lineWeight);
-    native static void popMatrix();
-    native static void translate(float v, float v1);
-    native static void pushMatrix();
-    native static void rotate(double v);
-    native static void textAlign(int align);
-    native static void fill(int color);
-    native static float textDescent();
-    native static float textAscent();
-    native static float textWidth(String label);
-    native static void text(String label, float x, float y);
 
+    public native static void size(float w, float h);
+    public native static void print(String s);
+    public native static void println(String s);
+    public native static float millis();
+    public native static void smooth();
+    public native static float random(float x);
+    public native static void background(int color);
+    public native static void stroke(int textColor);
+    public native static void link(String url, String aNew);
+    public native static void line(float x1, float y1, float x2, float y2);
+    public native static void noFill();
+    public native static void rect(float x, float y, float w, float h);
+    public native static void strokeWeight(int lineWeight);
+    public native static void popMatrix();
+    public native static void translate(float v, float v1);
+    public native static void pushMatrix();
+    public native static void rotate(double v);
+    public native static void textAlign(int align);
+    public native static void fill(int color);
+    public native static float textDescent();
+    public native static float textAscent();
+    public native static float textWidth(String label);
+    public native static void text(String label, float x, float y);
+    public native static void arc(float x, float y, float diamx, float diamy, float radStart, float radEnd);
 
     // !! TODO for anything that uses PFont or PImage, force ourselves to
     //    use "Game.xxxx" instead, so all our processing dependencies
     //    are in one place.
-    native static void image(PImage img, float x, float y);
-    native static void textFont(PFont font, int fontSize);
-    native static PImage loadImage(String path);
-    native static PImage createImage(int w, int hH, int mode);
-    native static PFont  loadFont(String path);
+    public native static void image(PImage img, float x, float y);
+    public native static void textFont(PFont font, int fontSize);
+    public native static PImage loadImage(String path);
+    public native static PImage createImage(int w, int hH, int mode);
+    public native static PFont  loadFont(String path);
 
     // can't mark primitives as native, but the processing builder will strip them out anyway
-    static float width;
-    static float height;
-    static char CODED;
     static char key;
     static int keyCode;
-    static int UP;
-    static int DOWN;
-    static int LEFT;
-    static int RIGHT;
-    static int BASELINE;
-    static int CENTER;
+    static float width;
+    static float height;
     static float mouseY;
     static float mouseX;
+    static int mouseButton;
+    static final char CODED = 0;
+    static final int UP = 1;
+    static final int DOWN = 2;
+    static final int LEFT = 3;
+    static final int RIGHT = 5;
+    static final int BASELINE = 6;
+    static final int CENTER = 7;
+    public static final int ARGB = 0;
+    public static final float PI = 3.14159265f;
+
 }
 // [/suppress]
