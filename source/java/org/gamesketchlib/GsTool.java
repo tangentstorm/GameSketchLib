@@ -12,39 +12,26 @@ package org.gamesketchlib;
  *   - games where you assign tasks to characters
  *   - etc.
  */
-public abstract class GsTool extends GsProto
+public abstract class GsTool extends GsBasic
 {
-    void click(float x, float y, GsBasic subject)
+    public void click(float mouseX, float mouseY, GsBasic subject)
     {
     }
 
-    void press(float x, float y, GsBasic subject)
+    public void press(float mouseX, float mouseY, GsBasic subject)
     {
     }
 
-    void dragStart(float x, float y, GsBasic subject)
-    {
-    }
-    
-    void drag(float x, float y, GsBasic subject)
+    public void dragStart(float mouseX, float mouseY, GsBasic subject)
     {
     }
 
-    void dragEnd(float x, float y, GsBasic subject)
+    public void drag(float mouseX, float mouseY, GsBasic subject)
     {
     }
-    
-    
-    /* Same as GsBasic.send
-     *
-     * A generic (untyped) message-passing protocol for
-     * communicating between objects.
-     *
-     * Messages should be defined with Game.newMessageId();
-     */
-    Object send(int message, Object arg)
+
+    public void dragEnd(float mouseX, float mouseY, GsBasic subject)
     {
-        return null;
     }
 }
 

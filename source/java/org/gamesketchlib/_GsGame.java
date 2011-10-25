@@ -7,10 +7,11 @@ import static org.gamesketchlib._GameSketchLib.*;
 // Game is a Singleton - i.e., the only instance of _GsGame.
 public class _GsGame
 {
-    GsState state;
-    GsObject bounds;
+    public GsState state;
+    public GsObject bounds;
     PFont defaultFont;
     GsKeys keys = new GsKeys();
+    GsGroup tools = new GsGroup();
     
     
     /**
@@ -18,10 +19,20 @@ public class _GsGame
      */
     public final GsMouse mouse = new GsMouse();
     
-    /**
-     * The current GsTool. Defaults to GsBasicTool;
-     */
-    public GsTool tool = new GsBasicTool();
+    private GsTool tool = new GsBasicTool();
+    private GsTool toolR = new GsBasicTool();
+    private GsTool toolM = new GsBasicTool();
+
+    public GsTool buttonTool(int mouseButton)
+    {
+        switch (mouseButton)
+        {
+            case (RIGHT): return this.toolR;
+            case (CENTER): return this.toolM;
+            default:
+                return this.tool;
+        }
+    }
     
     
     /**
@@ -48,14 +59,17 @@ public class _GsGame
         return mCodeCounter++;
     }
     private int mCodeCounter = 0;
-    
+
     
     /**
      * Switches the game to a new GsState. Pretty self-explanitory. :)
      */
-    void switchState(GsState newState)
+    public void switchState(GsState newState)
     {
         Game.state = newState;
+        Game.setTool(new GsBasicTool());
+        Game.setToolM(new GsBasicTool());
+        Game.setToolR(new GsBasicTool());
         Game.mouse.subjects.clear();
         Game.mouse.observers.clear();
         newState.create();
@@ -71,12 +85,15 @@ public class _GsGame
         this.state.update();
         
         // update the keyboard last (it clears justPressed, and we need it!)
-        this.keys.update();        
+        this.keys.update();
+
+        this.tools.update();
     }
     
     void render()
     {
         this.state.render();
+        this.tools.render();
     }
     
     void portrait()  { setOrientation(true); }
@@ -113,5 +130,41 @@ public class _GsGame
         {
         }
         return (_androidClass != null);
+    }
+
+    /**
+     * The current GsTool. Defaults to GsBasicTool;
+     */
+    public void setTool(GsTool tool)
+    {
+        this.tool = tool;
+        this.updateTools();
+    }
+
+    /**
+     * Tool to use for the right mouse button.
+     */
+    public void setToolR(GsTool toolR)
+    {
+        this.toolR = toolR;
+        this.updateTools();
+    }
+
+    /**
+     * Tool to use for the middle mouse button.
+     */
+    public void setToolM(GsTool toolM)
+    {
+        this.toolM = toolM;
+        this.updateTools();
+    }
+
+
+    private void updateTools()
+    {
+        this.tools.clear();
+        this.tools.add(this.tool);
+        this.tools.add(this.toolR);
+        this.tools.add(this.toolR);
     }
 }

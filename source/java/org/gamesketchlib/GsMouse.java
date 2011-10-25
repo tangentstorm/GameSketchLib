@@ -78,40 +78,52 @@ public class GsMouse
      * mouseover effects, etc.
      */
     public GsGroup observers = new GsGroup();
-  
+
     // mousePressed
-    public void pressed(float mouseX, float mouseY)
+    public void pressed(float mouseX, float mouseY, int mouseButton)
     {
         this.x = this.startX = mouseX;
         this.y = this.startY = mouseY;
-        
-        for (GsBasic gab : this.subjects.each())
+
+        this.subject = this.topSubject();
+        if (this.subject.exists)
         {
-            if (gab.containsPoint(this.x, this.y))
+            this.offsetX = this.subject.x - this.x;
+            this.offsetY = this.subject.y - this.y;
+        }
+    }
+
+    /**
+     * @return the topmost (first) subject at the point.
+     */
+    public GsBasic topSubject()
+    {
+        for (GsBasic gsb : this.subjects.reversed())
+        {
+            if (gsb.containsPoint(this.x, this.y))
             {
-                this.subject = gab;
-                this.offsetX = gab.x - this.x;
-                this.offsetY = gab.y - this.y;
-                return;
+                // println("subject is " + gsb.getClass().getName() + " at (" + gsb.x + "," + gsb.y + ")");
+                this.subject = gsb;
+                return gsb;
             }
         }
         // whatever they clicked on wasn't clickable :)
-        this.subject = GameNull;
+        return GameNull;
     }
-    
+
     // mouseReleased
-    public void released(float mouseX, float mouseY)
+    public void released(float mouseX, float mouseY, int mouseButton)
     {
         this.updateCoordinates(mouseX, mouseY);
         
         if (this.dragging)
         {
-            Game.tool.dragEnd(this.x, this.y, this.subject);
+            Game.buttonTool(mouseButton).dragEnd(this.x, this.y, this.subject);
         }
         else
         {
             // TODO add a timer and allow for long presses
-            Game.tool.click(this.x, this.y, this.subject);
+            Game.buttonTool(mouseButton).click(this.x, this.y, this.subject);
         }
       
         this.dragging = false;
@@ -128,16 +140,17 @@ public class GsMouse
     }
     
     // mouseDragged
-    public void dragged(float mouseX, float mouseY)
+    public void dragged(float mouseX, float mouseY, int mouseButton)
     {
         this.moved(mouseX, mouseY);
         if (! this.dragging)
         {
-            Game.tool.dragStart(this.startX, this.startY, this.subject);
+            Game.buttonTool(mouseButton).dragStart(this.startX, this.startY, this.subject);
             this.dragging = true;
         }
         this.updateCoordinates(mouseX, mouseY);
-        Game.tool.drag(this.x, this.y, this.subject);
+        Game.buttonTool(mouseButton).drag(this.x, this.y, this.subject);
+       // trace();
     }
     
     protected void updateCoordinates(float mouseX, float mouseY)
@@ -145,9 +158,17 @@ public class GsMouse
         this.x = mouseX;
         this.y = mouseY;
         this.adjustedX = this.x + this.offsetX;
-        this.adjustedY = this.y + this.adjustedY;
+        this.adjustedY = this.y + this.offsetY;
+        // trace();
     }
     
+    public void trace()
+    {
+        println("(" + Game.mouse.x + "," + Game.mouse.y + ")"
+              + " + (" + Game.mouse.offsetX + "," + Game.mouse.offsetY + ")"
+              + " = (" + Game.mouse.adjustedX + "," + Game.mouse.adjustedY + ")" );
+    }
+
     protected void notifyObservers()
     {
          for (GsBasic gab : this.observers.each())
