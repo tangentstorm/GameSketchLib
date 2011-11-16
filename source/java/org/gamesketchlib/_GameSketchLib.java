@@ -126,7 +126,8 @@ public class _GameSketchLib
     public native static float textWidth(String label);
     public native static void text(String label, float x, float y);
     public native static void arc(float x, float y, float diamx, float diamy, float radStart, float radEnd);
-
+    public native static void triangle(int x1, int y1, int x2, int y2, int x3, int y3);
+    
     // !! TODO for anything that uses PFont or PImage, force ourselves to
     //    use "Game.xxxx" instead, so all our processing dependencies
     //    are in one place.
