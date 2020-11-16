@@ -34,6 +34,8 @@ class GameBasic
      float dx = 0;
      float dy = 0;
 
+     GameObject() { this(0,0,0,0); }
+
      GameObject(float x, float y, float w, float h)
      {
          this.x = x;
@@ -76,6 +78,8 @@ class GameBasic
  class GameGroup extends GameObject
  {
      ArrayList members = new ArrayList();
+
+     GameGroup() { }
 
      GameBasic get(int i)
      {

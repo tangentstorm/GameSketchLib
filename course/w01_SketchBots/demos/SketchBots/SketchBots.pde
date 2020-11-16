@@ -67,14 +67,14 @@ void setup()
     // limit the number of frames per second
     frameRate(30);
     
-    mOrangeGuyD= loadImage("/static/uploaded_resources/p.1181/orangeguy-D.png");
-    mOrangeGuyU= loadImage("/static/uploaded_resources/p.1181/orangeguy-U.png");
-    mOrangeGuyR= loadImage("/static/uploaded_resources/p.1181/orangeguy-R.png");
-    mOrangeGuyL= loadImage("/static/uploaded_resources/p.1181/orangeguy-L.png");
+    mOrangeGuyD= loadImage("data/orangeguy-D.png");
+    mOrangeGuyU= loadImage("data/orangeguy-U.png");
+    mOrangeGuyR= loadImage("data/orangeguy-R.png");
+    mOrangeGuyL= loadImage("data/orangeguy-L.png");
     
-    mBackgroundImage= loadImage("/static/uploaded_resources/p.1181/background.png");
+    mBackgroundImage= loadImage("data/background.png");
     
-    mBlueGuyImage= loadImage("/static/uploaded_resources/p.1181/blueguy-D.png");
+    mBlueGuyImage= loadImage("data/blueguy-D.png");
 
     // initialize our "current frame" images
     mOrangeGuyImage = mOrangeGuyL; 
@@ -158,5 +158,3 @@ void keyReleased()
     break;
   }
 }
-
-
